@@ -1,0 +1,98 @@
+<div class="flex h-screen w-full overflow-hidden">
+  <!-- Left Side: Item List (60% width) -->
+  <div class="w-3/5 h-full flex flex-col border-r border-slate-200 bg-white">
+    <header class="p-8 border-b border-slate-100 flex items-center gap-4">
+      <span class="material-symbols-outlined text-primary text-4xl">shopping_basket</span>
+      <h1 class="text-3xl font-black tracking-tight text-slate-900">Your Basket</h1>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-8 py-4">
+      <table class="w-full text-left border-separate border-spacing-y-4">
+        <thead>
+          <tr class="text-slate-500 uppercase text-sm font-bold tracking-widest">
+            <th class="pb-4">Item Name</th>
+            <th class="pb-4 text-center">Qty</th>
+            <th class="pb-4 text-right">Price</th>
+          </tr>
+        </thead>
+        <tbody class="text-xl">
+          @for (item of items(); track item.id) {
+            <tr class="bg-slate-50 rounded-xl overflow-hidden">
+              <td class="py-6 px-6 rounded-l-xl font-bold">{{ item.name }}</td>
+              <td class="py-6 px-6 text-center font-medium text-slate-600">{{ item.qty }} {{ item.uom }}</td>
+              <td class="py-6 px-6 text-right font-black rounded-r-xl">{{ item.total | currencyIdr }}</td>
+            </tr>
+          }
+          @if (items().length === 0) {
+            <tr>
+              <td colspan="3" class="py-20 text-center text-slate-300">
+                <span class="material-symbols-outlined text-8xl mb-4 block">shopping_cart</span>
+                <p class="text-2xl font-bold">Waiting for items...</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total Savings Area -->
+    @if (savings() > 0) {
+      <div class="p-8 bg-primary/10 border-t border-primary/20">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary font-bold">celebration</span>
+            <span class="text-xl font-bold text-slate-900 uppercase tracking-tight">Total Savings Today</span>
+          </div>
+          <span class="text-3xl font-black text-primary">-{{ savings() | currencyIdr }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Right Side: Promo & Total (40% width) -->
+  <div class="w-2/5 h-full flex flex-col bg-brand-navy text-white p-10">
+    <!-- Promo/Message Area -->
+    <div class="flex-1 flex flex-col">
+      <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-800 mb-8 border border-white/10">
+        <div class="absolute inset-0 bg-gradient-to-t from-brand-navy/80 to-transparent"></div>
+        <div class="absolute inset-0 flex flex-col justify-center items-center text-center p-8">
+          <span class="material-symbols-outlined text-6xl text-primary mb-4">favorite</span>
+          <h2 class="text-4xl font-black leading-tight">Thank You for <br/>Shopping with Us!</h2>
+          <p class="mt-4 text-slate-300 text-lg">Earn double points today with our Loyalty Program.</p>
+        </div>
+      </div>
+
+      <!-- Transaction Info -->
+      <div class="space-y-6 mt-4">
+        <div class="flex justify-between items-center text-slate-400">
+          <span class="text-xl">Subtotal</span>
+          <span class="text-xl font-bold">{{ subtotal() | currencyIdr }}</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-400">
+          <span class="text-xl">Tax</span>
+          <span class="text-xl font-bold">{{ tax() | currencyIdr }}</span>
+        </div>
+        <div class="h-px bg-white/10 w-full my-4"></div>
+      </div>
+    </div>
+
+    <!-- Grand Total Section -->
+    <div class="mt-auto">
+      <div class="bg-primary/20 border-2 border-primary rounded-2xl p-8 text-center">
+        <p class="text-primary font-bold uppercase tracking-[0.2em] mb-2 text-xl">Grand Total</p>
+        <p class="text-8xl font-black text-white tracking-tighter">{{ grandTotal() | currencyIdr }}</p>
+      </div>
+      <div class="mt-8 flex items-center justify-center gap-4 text-slate-400">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">schedule</span>
+          <span class="text-sm font-medium">{{ currentTime() }}</span>
+        </div>
+        <div class="w-1 h-1 bg-slate-600 rounded-full"></div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">confirmation_number</span>
+          <span class="text-sm font-medium">Station {{ terminalId }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

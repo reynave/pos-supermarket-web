@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .thermal-paper {
+            background: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .thermal-paper::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(-45deg, transparent 5px, #ffffff 5px), linear-gradient(45deg, transparent 5px, #ffffff 5px);
+            background-size: 10px 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen w-full flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-2xl">receipt_long</span>
+</div>
+<div>
+<h2 class="text-xl font-bold leading-tight">Transaction Details</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Terminal #01 • Ref: TXN-88291</p>
+</div>
+</div>
+<button class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">close</span>
+</button>
+</header>
+<main class="flex flex-1 overflow-hidden p-6 gap-6">
+<!-- Left Column: Thermal Receipt Preview -->
+<div class="flex-1 flex flex-col items-center justify-start overflow-y-auto bg-slate-200/50 dark:bg-slate-900/50 rounded-2xl p-8">
+<div class="thermal-paper w-full max-w-md p-8 text-slate-800 font-mono text-sm leading-relaxed">
+<!-- Store Header -->
+<div class="text-center mb-6">
+<div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+<span class="material-symbols-outlined text-primary text-3xl">local_mall</span>
+</div>
+<h3 class="font-bold text-lg uppercase tracking-wider">FreshMart Central</h3>
+<p class="text-xs">123 Market Street, Downtown</p>
+<p class="text-xs">Tel: (555) 012-3456</p>
+</div>
+<!-- Meta Info -->
+<div class="border-b border-dashed border-slate-300 pb-4 mb-4">
+<div class="flex justify-between">
+<span>Date:</span>
+<span>Oct 24, 2023 14:42</span>
+</div>
+<div class="flex justify-between">
+<span>Cashier:</span>
+<span>Sarah J.</span>
+</div>
+<div class="flex justify-between font-bold">
+<span>Order ID:</span>
+<span>#88291-001</span>
+</div>
+</div>
+<!-- Itemized List -->
+<div class="border-b border-dashed border-slate-300 pb-4 mb-4 space-y-2">
+<div class="flex justify-between">
+<span class="flex-1">Organic Whole Milk 1L</span>
+<span class="w-12 text-right">x1</span>
+<span class="w-20 text-right">$4.50</span>
+</div>
+<div class="flex justify-between">
+<span class="flex-1">Artisan Wheat Bread</span>
+<span class="w-12 text-right">x1</span>
+<span class="w-20 text-right">$3.20</span>
+</div>
+<div class="flex justify-between">
+<span class="flex-1">Hass Avocado (Import)</span>
+<span class="w-12 text-right">x2</span>
+<span class="w-20 text-right">$4.00</span>
+</div>
+<div class="flex justify-between">
+<span class="flex-1">Eco-friendly Paper Bag</span>
+<span class="w-12 text-right">x1</span>
+<span class="w-20 text-right">$0.50</span>
+</div>
+</div>
+<!-- Totals -->
+<div class="space-y-1 mb-6">
+<div class="flex justify-between">
+<span>Subtotal</span>
+<span>$12.20</span>
+</div>
+<div class="flex justify-between">
+<span>Tax (10%)</span>
+<span>$1.22</span>
+</div>
+<div class="flex justify-between font-bold text-lg pt-2 border-t border-slate-200">
+<span>TOTAL</span>
+<span>$13.42</span>
+</div>
+</div>
+<!-- QRIS / Payment Confirmation -->
+<div class="bg-slate-50 p-4 rounded-lg flex flex-col items-center gap-2 border border-slate-100">
+<p class="text-[10px] uppercase font-bold text-slate-500">Payment Confirmed via QRIS</p>
+<div class="w-24 h-24 bg-white border border-slate-200 p-1">
+<img alt="QR code for payment confirmation" class="w-full h-full grayscale opacity-80" data-alt="QR code for digital payment confirmation on receipt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZG7WJr-P4kQlWZNE8CzpBG0J53yVSCQmOQhrc8Wm9oePDZ0HE03a3VLxnaZ-VQ77Uybm5uIHKK5ejncbIUKQbthn-BPQItjzd2A4fQwcL6wX4qpSBCA_cxKNJgKao92rmg3cTqNjqM121xZpDjkJ1smrZqJKRRClGyhRXvF73ffhcA2F8F-2ghjvvDuMDdxfBM9HwutMRgVMgZV3gPzOoBNAryo8f7hfuxJOqoqkIEFkPea4jK8QZfXCFKTQDf2sZUkrZZv6byhw"/>
+</div>
+<p class="text-[10px] text-slate-400">Auth ID: 9918277361</p>
+</div>
+<div class="text-center mt-8">
+<p class="text-xs italic">Thank you for shopping with us!</p>
+<p class="text-[10px] mt-2">v2.4.1 Build 20231024</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Functional Buttons -->
+<div class="w-1/3 flex flex-col gap-4 overflow-y-auto pr-2">
+<button class="group flex items-center gap-4 w-full p-6 rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95">
+<span class="material-symbols-outlined text-3xl">print</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">PRINT COPY</p>
+<p class="text-sm opacity-80">Thermal printer 1 (Online)</p>
+</div>
+</button>
+<div class="grid grid-cols-1 gap-4">
+<button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary text-3xl">share</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">SEND VIA WHATSAPP</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Digital receipt to phone</p>
+</div>
+</button>
+<button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary text-3xl">mail</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">EMAIL RECEIPT</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Send to customer's inbox</p>
+</div>
+</button>
+<button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary text-3xl">account_circle</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">ADD TO PROFILE</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Assign to existing customer</p>
+</div>
+</button>
+<button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary text-3xl">call_split</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">VIEW PAYMENT SPLIT</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Cash/Credit breakdown</p>
+</div>
+</button>
+</div>
+<div class="mt-auto pt-4">
+<button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-600 transition-colors active:scale-95">
+<span class="material-symbols-outlined text-3xl">assignment_return</span>
+<div class="text-left">
+<p class="text-lg font-bold leading-none">ISSUE REFUND/RETURN</p>
+<p class="text-sm opacity-80">Requires manager override</p>
+</div>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

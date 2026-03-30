@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<title>SuperMarket POS - Main Menu</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="size-8 flex items-center justify-center rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<div class="flex flex-col">
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">SuperMarket POS</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Main Branch • Station #04</p>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="hidden md:flex flex-col items-end mr-4">
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Monday, Oct 23</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">14:45 PM</p>
+</div>
+<div class="flex gap-2">
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-xl h-10 px-4 bg-primary text-white text-sm font-bold leading-normal transition-colors hover:bg-primary/90">
+<span class="truncate">Sarah J.</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors hover:bg-slate-200">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+</div>
+<div class="bg-slate-200 dark:bg-slate-700 rounded-full size-10 overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="Portrait of a female cashier Sarah" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG_L4fgzb7FXm4d4Zz2BNAriZwZux_SzX7sOTmVMGzasJCbDso48Mm0XSSBDA8p4v7GHIaADZBwL5Hi9hp0M7kkkGUh06aLW-dOOSbz4CKtK05UzAZlKULPdOdY_QEePSNo9uGXpUVrXEprOCrHl8NUlspdeK4-5TeS7RgBKhS_M20vE0TSbiYdnF3rkt2zlWUdR8TwbJPO8xidiLFc3eWB5Zy7c5Ge3uKs_d-Cybrsmtvfn1b-ZkmDDPFb8PnqqwT6QBYyn-dRas"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center justify-center p-6 lg:p-12">
+<div class="max-w-6xl w-full">
+<!-- Welcome Section -->
+<div class="mb-10 text-center md:text-left">
+<h1 class="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Welcome back, Sarah</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg">Select a module to start your shift</p>
+</div>
+<!-- Grid of Modules -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Sales Register -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">point_of_sale</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Sales Register</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Process customer transactions and payments</p>
+</div>
+<!-- Inventory Management -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">inventory_2</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Inventory</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Manage stock levels, orders and suppliers</p>
+</div>
+<!-- Shift Reports -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">assessment</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Shift Reports</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">View daily summaries and cash out reports</p>
+</div>
+<!-- Product Lookup -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">search</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Product Lookup</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Search prices and availability across branches</p>
+</div>
+<!-- Customer Loyalty -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">card_membership</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Customer Loyalty</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Manage rewards and membership profiles</p>
+</div>
+<!-- System Settings -->
+<div class="group cursor-pointer bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+<div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">tune</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Settings</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Hardware, printers and terminal configuration</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer / Sidebar-like nav -->
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-4">
+<div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-primary font-medium">
+<span class="material-symbols-outlined">wifi</span>
+<span class="text-sm">Online</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-medium">
+<span class="material-symbols-outlined">print</span>
+<span class="text-sm">Printer: OK</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">help</span>
+<span class="text-sm font-semibold">Support</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-semibold">Logout</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

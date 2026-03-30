@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>POS Daily Sales Report</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-4 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">point_of_sale</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">POS System</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4">
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200 dark:border-slate-700" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_9I5xQCE207mVivKRyLr44qbxZhsDsFCBtSsoVnMPqM7WUNj3Tf_t872opWKTyMgHXir0AVlfVTPlYJHoKeJiVrvMEYBPJgChqJky7U-yZ7dv92ftundZhyfUmyLz8-62eLTV1w7a7zZWQOxIrAPD8SGftwNrCf5Ga-6XlKJFyQH0F_0mRg-TRnN9dTxzbcQ62KojqjFYfupwiv_Y7f-3MTC4X9EH-vWhRZZB4MNuFSPcgqkIbTJIBQdhTUYo1rYPDMkoQBvBPWE");'></div>
+</div>
+</header>
+<main class="flex flex-1 flex-col px-4 py-8 lg:px-10 max-w-[1200px] mx-auto w-full">
+<!-- Header Section with Date Selector -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-slate-900 dark:text-slate-100 text-4xl font-black leading-tight tracking-tight">Daily Sales Report</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg">Detailed breakdown of today's business performance</p>
+</div>
+<div class="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="px-4 text-slate-900 dark:text-slate-100 font-bold min-w-[140px] text-center">
+                            October 24, 2023
+                        </div>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Transaction Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-12">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-bottom border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Trans ID</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Time</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">Payment Method</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider text-right">Total Amount</th>
+<th class="px-6 py-4 text-slate-500 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5 font-medium text-slate-900 dark:text-slate-100">#TRX-8291</td>
+<td class="px-6 py-5 text-slate-600 dark:text-slate-400">08:42 AM</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase">Cash</span>
+</td>
+<td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">$45.00</td>
+<td class="px-6 py-5 text-center">
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                            Detail
+                                        </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5 font-medium text-slate-900 dark:text-slate-100">#TRX-8292</td>
+<td class="px-6 py-5 text-slate-600 dark:text-slate-400">09:15 AM</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-bold uppercase">QRIS</span>
+</td>
+<td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">$12.50</td>
+<td class="px-6 py-5 text-center">
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                            Detail
+                                        </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5 font-medium text-slate-900 dark:text-slate-100">#TRX-8293</td>
+<td class="px-6 py-5 text-slate-600 dark:text-slate-400">10:05 AM</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase">Card</span>
+</td>
+<td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">$120.00</td>
+<td class="px-6 py-5 text-center">
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                            Detail
+                                        </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5 font-medium text-slate-900 dark:text-slate-100">#TRX-8294</td>
+<td class="px-6 py-5 text-slate-600 dark:text-slate-400">11:22 AM</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-bold uppercase">QRIS</span>
+</td>
+<td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">$65.20</td>
+<td class="px-6 py-5 text-center">
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                            Detail
+                                        </button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-5 font-medium text-slate-900 dark:text-slate-100">#TRX-8295</td>
+<td class="px-6 py-5 text-slate-600 dark:text-slate-400">12:30 PM</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase">Cash</span>
+</td>
+<td class="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">$30.00</td>
+<td class="px-6 py-5 text-center">
+<button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-primary hover:text-white dark:hover:bg-primary transition-all rounded-lg text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                            Detail
+                                        </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Summary & Pagination -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
+<div class="text-slate-500 dark:text-slate-400">
+                        Showing <span class="font-bold text-slate-900 dark:text-slate-100">5</span> of <span class="font-bold text-slate-900 dark:text-slate-100">124</span> transactions
+                    </div>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold">Previous</button>
+<button class="px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold">Next</button>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-2xl">print</span>
+<span class="text-lg font-bold tracking-wide">Print Report</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

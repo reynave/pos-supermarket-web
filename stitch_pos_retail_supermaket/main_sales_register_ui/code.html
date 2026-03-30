@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SuperPOS - Sales Register</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm z-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">shopping_basket</span>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">SuperPOS</h1>
+</div>
+<div class="relative w-96">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-primary focus:border-primary text-lg" placeholder="Scan or search items..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold transition-colors">
+<span class="material-symbols-outlined">sell</span>
+                Price Check
+            </button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold transition-colors">
+<span class="material-symbols-outlined">person_search</span>
+                Member Search
+            </button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<button class="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-3 ml-2">
+<div class="text-right">
+<p class="text-sm font-bold">Register 04</p>
+<p class="text-xs text-slate-500">Cashier: Alex M.</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                    AM
+                </div>
+</div>
+</div>
+</header>
+<!-- Main Content Area: Split Screen -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Side: Active Transaction List (40%) -->
+<section class="w-[40%] flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-left">
+<thead class="sticky top-0 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+<tr>
+<th class="px-6 py-4 text-sm font-bold uppercase tracking-wider">Item Name</th>
+<th class="px-4 py-4 text-sm font-bold uppercase tracking-wider text-center">Qty</th>
+<th class="px-4 py-4 text-sm font-bold uppercase tracking-wider text-right">Price</th>
+<th class="px-6 py-4 text-sm font-bold uppercase tracking-wider text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<p class="font-bold text-lg">Organic Bananas</p>
+<p class="text-xs text-slate-500">SKU: 4011-92</p>
+</td>
+<td class="px-4 py-5 text-center text-lg">1.2 kg</td>
+<td class="px-4 py-5 text-right text-lg">$1.50/kg</td>
+<td class="px-6 py-5 text-right font-bold text-lg">$1.80</td>
+</tr>
+<tr class="bg-primary/10 border-l-4 border-primary">
+<td class="px-6 py-5">
+<p class="font-bold text-lg text-primary">Whole Milk 2L</p>
+<p class="text-xs text-slate-500">SKU: 8223-10</p>
+</td>
+<td class="px-4 py-5 text-center text-lg font-bold">1</td>
+<td class="px-4 py-5 text-right text-lg">$3.50</td>
+<td class="px-6 py-5 text-right font-bold text-lg">$3.50</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<p class="font-bold text-lg">Sourdough Bread</p>
+<p class="text-xs text-slate-500">SKU: 1109-45</p>
+</td>
+<td class="px-4 py-5 text-center text-lg">1</td>
+<td class="px-4 py-5 text-right text-lg">$4.25</td>
+<td class="px-6 py-5 text-right font-bold text-lg">$4.25</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<p class="font-bold text-lg">Hass Avocado</p>
+<p class="text-xs text-slate-500">SKU: 4421-00</p>
+</td>
+<td class="px-4 py-5 text-center text-lg">2</td>
+<td class="px-4 py-5 text-right text-lg">$2.00</td>
+<td class="px-6 py-5 text-right font-bold text-lg">$4.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Transaction Summary -->
+<div class="p-6 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700">
+<div class="space-y-2 mb-4">
+<div class="flex justify-between text-slate-600 dark:text-slate-400">
+<span class="text-lg">Subtotal</span>
+<span class="text-lg font-medium">$13.55</span>
+</div>
+<div class="flex justify-between text-slate-600 dark:text-slate-400">
+<span class="text-lg">Tax (8%)</span>
+<span class="text-lg font-medium">$1.08</span>
+</div>
+</div>
+<div class="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-primary shadow-inner">
+<span class="text-2xl font-bold uppercase tracking-widest text-primary">Total</span>
+<span class="text-5xl font-black text-slate-900 dark:text-white">$14.63</span>
+</div>
+</div>
+</section>
+<!-- Right Side: Quick Access Grid (60%) -->
+<section class="w-[60%] p-6 bg-background-light dark:bg-background-dark overflow-y-auto">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold">Quick Access</h2>
+<div class="flex gap-2">
+<button class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-6">
+<!-- Category Cards -->
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-emerald-500">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Fresh vegetables and fruits arranged neatly" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBb0nJ89bBic9hbX-S6bepdokNnekZ8SPdIAWq5VIKrRB9D_Rd6glcCJ6Oe8klUIwB_5rVYkWu5gjgxX_1e2iQ7M7JcJaBQJN10YIMGBeVIrlSlcBnbPLK90ynnDkvfTIKxujsNEi1i7wLXj4eAqBMeFFTouOfP79qVWKnxdDtIRJORn1MCj-5-8AFYTZfNn_3LrQ5U9chJM7pPBX0kxQX0YfsR7wnjQuYZ4oQhOz4W6VnZefB1d0XZvgkbCUDE2Q1rmY_lUBjXYas')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Fresh Produce</p>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-blue-500">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Milk, cheese, and yogurt products" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDu0iU3Q9TNEOo6nVAKsCkmosualLYTvrrzN3kxOcJr-vP_YcvQHcpJc4CsLggGbM9sWqcFkpfmUjVOtExlmClViY4HwJ1MqXPk_EjvsAt2XLDHjHUzx7bHxRimxMyQ74tQKF-gd2iS-PbUHRSB9aGORIp7G3NoI-3oc74bZX1t58fYYfgyy7TIFRuucDq48rCz8tFF-VWRIjMjtfJUz9HXPoO-mbTju5OtmeY6W1iAdqjlq94yLGnSQXCQBuW7fCB2Cook0_dSu-M')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Dairy</p>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-amber-500">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Assorted potato chips and snacks" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGGwQ846dCF8RphWOERYlXYOsXA0uPyH6fPM-UWsK-P8FlE0LgnaEDDdrNYinN-dzYr4ycWEcb-1MquJlLGr7OnEkI30vlRBJf0x5kbt48CHgL0Vcys4EhdvoARXxrLW7KrY0zyjJA1DCs19jQy2e2csc5iHIxW8_ZC-fZyJOUue1Zw-UNp2SbpVygcPfl7R_ijpcpMKybP0seTgr5YjKwCD4059ELmMdHUZ-KXzzJ11LGtwctgZDem-u-2_aEM-MfjNszS051wik')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Snacks</p>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-orange-400">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Freshly baked bread and pastries" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmpmLg8tzA4J85AK6Mf6ZOIxbg8-bhgGFL7ygp17y4RHF9y4jlQZKEIbOjAOMXS6wBXvGlnDAR7LzbyL1uCFJ0mL9or3XLOd84FmygsvMuYnUXwf-pts0oeDs8L6KD5L4s4TWt-fNELsklvblC93ST_pABb-QDt7t6zNo_LHHrOyLk59NKnfS5MX5OkyAzNrvZGGEnle3RMwWPPpnI5YZh0PqPQoB5wKRmWKriv4-Upf6YgbztiGAPHktEEMfx2fENxEb12y24Ud8')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Bakery</p>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-rose-600">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Cuts of fresh raw beef and poultry" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCzJE0V0k3qOOjxtz6xMpMaxUXu19_MFMFwVb7Sxd6n4wF_qeJmqVfGS5QIn8V1zQKxjhUqLAqIeeuy05cvW3wUDwabGzln6bzzohq8IcX4GVyP-_VSk4rTXdna8q9rsMEjqwbuTX8ao9Gj_ZFX4nUWyz1ANy_J5YyH7MoM9TPZMujKC3va5ZybiVL4aaP1-Du2REA93L6_BhGNtrPD_Il_L0k2y0hyk0kSFl53M3Pjs33juJ_nbs_KV1MGM70gAVm1zIEBtD4tzQs')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Meat</p>
+</div>
+</button>
+<button class="group relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border-b-8 border-cyan-400">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Frozen food packages in a freezer" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCz90f3SHodejQTvXX1M6zxAQDIYjEkDkLLCJPAvm7fLKueC_p69qDFsrt_gq5w4UKJRAHq5oVt1ivdYzh_8RLmZ48xUGJEnK50ASLV3OB_hoKJ_dwB4HvcdWB6esN2n0S6cc8kshvEJBx2wxLIV5BE07fLEoccAFzYcFCca9QqZUd9GzSufpgPeC3cGMg9HxfDgwxqh9amXTGF_433JRRt8DN8DeUWfWnfvbujNE_3RSY4lM8AXkCKAgxEpxqMc9vEO9NUXoFQF0k')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-2xl font-black text-white uppercase tracking-tight">Frozen</p>
+</div>
+</button>
+<!-- Additional Quick Actions -->
+<button class="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-500 hover:border-primary hover:text-primary transition-all group">
+<span class="material-symbols-outlined text-4xl mb-2 group-hover:scale-110 transition-transform">add_circle</span>
+<span class="font-bold uppercase tracking-wider">Add Custom</span>
+</button>
+<button class="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary transition-all">
+<span class="material-symbols-outlined text-4xl mb-2">qr_code_scanner</span>
+<span class="font-bold uppercase tracking-wider">Gift Card</span>
+</button>
+<button class="flex flex-col items-center justify-center p-6 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-primary transition-all">
+<span class="material-symbols-outlined text-4xl mb-2">replay</span>
+<span class="font-bold uppercase tracking-wider">Return</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="bg-slate-900 h-32 flex items-stretch p-4 gap-4">
+<button class="flex-1 flex flex-col items-center justify-center bg-red-600 hover:bg-red-700 text-white rounded-2xl transition-all active:scale-95 shadow-lg">
+<span class="material-symbols-outlined text-4xl mb-1">delete_forever</span>
+<span class="text-xl font-black uppercase tracking-widest">Void Item</span>
+</button>
+<button class="flex-1 flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-2xl transition-all active:scale-95 shadow-lg">
+<span class="material-symbols-outlined text-4xl mb-1">pause_circle</span>
+<span class="text-xl font-black uppercase tracking-widest">Suspend Bill</span>
+</button>
+<button class="flex-[3] flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all active:scale-[0.98] shadow-lg gap-6">
+<div class="flex flex-col items-start">
+<span class="text-2xl font-bold opacity-80 uppercase leading-none">Complete Order</span>
+<span class="text-5xl font-black tracking-tighter">PAY $14.63</span>
+</div>
+<span class="material-symbols-outlined text-7xl">payments</span>
+</button>
+</footer>
+</body></html>

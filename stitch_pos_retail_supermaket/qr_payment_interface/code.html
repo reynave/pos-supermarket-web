@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#edeeef",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9fa",
+                        "error": "#ba1a1a",
+                        "outline": "#737785",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#324575",
+                        "secondary-container": "#b3c5fd",
+                        "surface-variant": "#e1e3e4",
+                        "primary-container": "#0056d2",
+                        "on-surface-variant": "#424654",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary": "#822800",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "on-tertiary-fixed": "#380d00",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "outline-variant": "#c3c6d6",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcf",
+                        "inverse-primary": "#b2c5ff",
+                        "tertiary-container": "#a93802",
+                        "on-primary-fixed-variant": "#0040a1",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-container": "#ffcebd",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "primary-fixed": "#dae2ff",
+                        "on-secondary-fixed": "#001847",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface": "#191c1d",
+                        "surface-dim": "#d9dadb",
+                        "on-background": "#191c1d",
+                        "surface": "#f8f9fa",
+                        "secondary": "#4a5d8e",
+                        "on-primary-fixed": "#001847",
+                        "surface-tint": "#0056d2",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#dae2ff",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-secondary-container": "#3e5181",
+                        "on-primary-container": "#ccd8ff",
+                        "primary": "#0040a1"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-slate-50 dark:bg-slate-900 font-manrope text-slate-900 dark:text-slate-100 docked w-full top-0 border-none flat no shadows flex justify-between items-center px-6 py-4 fixed z-50">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold text-blue-800 dark:text-blue-300">Precision Merchant</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors active:scale-95 duration-150 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors active:scale-95 duration-150 p-2 rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<nav class="bg-slate-100 dark:bg-slate-800/50 font-inter text-sm h-full w-64 border-r border-slate-200/10 fixed left-0 top-0 flex flex-col pt-16 z-40">
+<div class="px-6 py-8 flex flex-col items-center border-b border-outline-variant/10">
+<div class="w-16 h-16 rounded-full overflow-hidden mb-3 ring-2 ring-primary/20">
+<img alt="Cashier Portrait" class="w-full h-full object-cover" data-alt="professional portrait of a friendly retail store manager in a clean white studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYCc4YLB77nQCSDGKu6ZIgCQddZhccw2Orn9m3kV9XcRAHiuLxbGQPqLWLT6Ro3Cs3eaRzbjREe6w28GIzSfiWjerQYltsbTUMWBK9XP6xxoCYkTsYSBblFGVJSTtUSvHZkxqkGK2w6SAhtkhZipuRdGMnO52_1chyE1lrgjG7HSqeYJBzfvZlp6RYxq_DFCUi7kqPHCZP_QvgGXBZZdFWua4aO66aqFB8Ho_TZ19qT8ges8K4NZyZMU7bXWbGQumLZ3pGEfipFnY"/>
+</div>
+<p class="font-bold text-on-surface">Station 04</p>
+<p class="text-xs text-on-surface-variant/70 uppercase tracking-widest">Active Session</p>
+</div>
+<div class="flex-1 py-6 space-y-1">
+<a class="flex items-center gap-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg mx-2 px-4 py-3 transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-medium">Checkout</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 px-4 py-3 hover:bg-slate-200 dark:hover:bg-slate-700 mx-2 rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-medium">Transactions</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 px-4 py-3 hover:bg-slate-200 dark:hover:bg-slate-700 mx-2 rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-medium">Inventory</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 px-4 py-3 hover:bg-slate-200 dark:hover:bg-slate-700 mx-2 rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-64 pt-20 h-screen flex flex-col items-center justify-center p-8 bg-surface">
+<div class="w-full max-w-4xl flex flex-col items-center">
+<!-- Header Section -->
+<div class="text-center mb-10">
+<p class="font-label text-sm uppercase tracking-[0.2em] text-on-surface-variant font-semibold mb-2">TOTAL AMOUNT TO PAY</p>
+<h1 class="font-headline text-7xl md:text-8xl font-extrabold text-primary tracking-tight">
+                    $1,249.00
+                </h1>
+</div>
+<!-- QR Code Bento Card -->
+<div class="relative group">
+<!-- Ambient Glow behind the card -->
+<div class="absolute -inset-4 bg-primary/5 blur-3xl rounded-full"></div>
+<div class="relative bg-surface-container-lowest p-12 rounded-[2rem] shadow-[0_20px_40px_rgba(25,28,29,0.06)] flex flex-col items-center transition-transform hover:scale-[1.01] duration-300">
+<!-- QR Container -->
+<div class="bg-white p-6 rounded-2xl border-4 border-surface-container">
+<img alt="QR Payment Code" class="w-64 h-64 md:w-80 md:h-80 object-contain" data-alt="a large high resolution black and white qr code on a crisp white background centered for easy scanning" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7GwOrqB_sOEpG_ZbynbigJ_yN51bjyP3O-LfRa_ZdHwJ7OST4qk3v0MchZJPcTn-8mhAYRbW7AH4_V5AtPR93ehk7z03zpd8OqGoThgQR7Os2PuLhGXW3-Mruc6QxAyI02ppn2RQ-ZlUlb5_KftdP7dbAsaVSGTXcA1gGUTrDzyDqnAnBF_MaFEcycu1C0QMtTCBrIHWYjRxHknVTQL1yG1qRgUPZpqkNV7fsGGF_Ep-uOW32cIS-0Oq1ltVnmlFU3KaOkcEkNKk"/>
+</div>
+<!-- Digital Wallets Supported -->
+<div class="mt-8 flex gap-6 items-center opacity-60 grayscale hover:grayscale-0 transition-all">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" data-icon="wallet" style="font-variation-settings: 'FILL' 1;">wallet</span>
+<span class="text-xs font-bold tracking-widest uppercase">QRIS / ShopeePay / GOPAY</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Status & Timer Section -->
+<div class="mt-12 flex flex-col items-center gap-4 text-center">
+<div class="flex items-center gap-3 bg-secondary-container/30 px-6 py-2 rounded-full border border-secondary-container/20">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+<span class="font-body text-lg font-medium text-on-surface">Payment status: Waiting for scan...</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-xl" data-icon="timer">timer</span>
+<span class="font-headline text-2xl font-bold">04:59</span>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="fixed bottom-0 left-64 right-0 p-8 flex justify-center pointer-events-none">
+<div class="w-full max-w-lg pointer-events-auto">
+<button class="w-full bg-error-container text-on-error-container hover:bg-error hover:text-white transition-all duration-300 rounded-xl py-6 px-10 flex items-center justify-center gap-4 group active:scale-[0.98] shadow-sm">
+<span class="material-symbols-outlined text-2xl" data-icon="cancel">cancel</span>
+<span class="font-headline text-xl font-extrabold tracking-wide">CANCEL TRANSACTION</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Visual Accents -->
+<div class="fixed top-20 right-8 pointer-events-none opacity-10">
+<span class="material-symbols-outlined text-[12rem]" data-icon="qr_code_2" style="font-variation-settings: 'wght' 100;">qr_code_2</span>
+</div>
+</body></html>
