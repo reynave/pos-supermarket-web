@@ -333,3 +333,11 @@ The `stitch_pos_retail_supermaket/` folder contains 15 HTML mockups created with
 - **No SCSS** — plain CSS only
 - **Imports** — use relative paths within feature, `../../../core/` for cross-cutting
 - **Currency** — IDR format via `currency-idr.pipe.ts` (`Rp 1.234.567`)
+
+### AI Restrictions
+
+- **AI is strictly prohibited** from using any Angular API or framework feature marked as **Developer Preview** in the official Angular documentation for the project's Angular version.
+- AI must always prefer **stable, production-ready APIs** and patterns.
+- If a requested implementation would require a Developer Preview feature, AI must **reject that approach** and provide the closest stable alternative.
+- This restriction applies to Angular core APIs, signal-related extensions, forms APIs, queries, inputs, model APIs, and any other feature explicitly labeled as **Developer Preview**.
+- For this project on **Angular 18.x**, AI must avoid Developer Preview features such as `effect()`, signal inputs via `input()`, model inputs via `model()`, and signal queries when they are still marked as preview in the Angular 18 documentation.

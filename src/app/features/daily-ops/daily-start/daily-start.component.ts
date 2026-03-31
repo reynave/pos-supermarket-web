@@ -64,33 +64,28 @@ export class DailyStartComponent {
     const openingBalance = parseFloat(this.displayAmount()) || 0;
     this.loading.set(true);
     this.errorMessage.set('');
+
+    this.http.post<ApiResponse<{ settlementId: string; cashierId: string; openingBalance: number; terminalId: string; alreadyOpen: boolean }>>(
+      `${environment.apiUrl}/shift/open`,
+      { openingBalance, terminalId: environment.terminalId },
+    ).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.success && res.data) {
           this.sessionService.startShift({
-            shiftId: '123123',
-            settlementId: '456456',
+            shiftId: res.data.settlementId,
+            settlementId: res.data.settlementId,
             openingBalance,
           });
           this.router.navigate(['/cart']);
-    // this.http.post<ApiResponse<{ shiftId: string; settlementId: string }>>(
-    //   `${environment.apiUrl}/shifts/open`,
-    //   { openingBalance, terminalId: environment.terminalId },
-    // ).subscribe({
-    //   next: (res) => {
-    //     this.loading.set(false);
-    //     if (res.success && res.data) {
-    //       this.sessionService.startShift({
-    //         shiftId: res.data.shiftId,
-    //         settlementId: res.data.settlementId,
-    //         openingBalance,
-    //       });
-    //       this.router.navigate(['/cart']);
-    //     } else {
-    //       this.errorMessage.set(res.message || 'Failed to open shift');
-    //     }
-    //   },
-    //   error: (err) => {
-    //     this.loading.set(false);
-    //     this.errorMessage.set(err?.error?.message || 'Network error');
-    //   },
-    // });
+        } else {
+          this.errorMessage.set(res.message || 'Failed to open shift');
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.errorMessage.set(err?.error?.message || 'Network error');
+      },
+    });
   }
 }

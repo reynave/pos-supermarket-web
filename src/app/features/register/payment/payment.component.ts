@@ -87,27 +87,29 @@ export class PaymentComponent implements OnInit {
     this.paymentLoading.set(true);
 
     const session = this.sessionService.session();
-    const body = {
+    const paymentTypeMap: Record<string, string> = { cash: 'CASH', card: 'DEBITCC', qris: 'QRIS' };
+    const body: Record<string, unknown> = {
+      kioskUuid: this.cartService.kioskUuid(),
       terminalId: environment.terminalId,
-      shiftId: session?.shiftId,
-      items: this.cartService.cart().map((c) => ({
-        itemId: c.itemId,
-        qty: c.qty,
-        price: c.price,
-        discount: c.discount,
-      })),
+      settlementId: session?.settlementId || session?.shiftId || '',
       payments: [{
-        paymentTypeId: method === 'cash' ? 1 : method === 'card' ? 2 : 3,
+        paymentTypeId: paymentTypeMap[method],
         amount: this.cartService.grandTotal(),
         reference: '',
       }],
     };
+
+    // For cash, include actual tendered amount so backend can calculate change
+    if (method === 'cash') {
+      body['cashReceived'] = parseFloat(this.cashReceived()) || 0;
+    }
 
     this.http.post<ApiResponse<Transaction>>(`${environment.apiUrl}/transactions`, body).subscribe({
       next: (res) => {
         this.paymentLoading.set(false);
         if (res.success && res.data) {
           this.cartService.saveForReceipt(res.data, method);
+          this.cartService.clearKioskUuid(); // remove kioskUuid from localStorage after payment
           this.socketService.emit('display:update', { items: [], subtotal: 0, tax: 0, total: 0 });
           this.router.navigate(['/receipt']);
         }
@@ -121,6 +123,6 @@ export class PaymentComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/cart']);
+    history.back();
   }
 }

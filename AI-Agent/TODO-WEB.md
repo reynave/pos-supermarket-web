@@ -102,13 +102,13 @@
 - **Route**: `/display`
 
 ## Phase 3: Backend API Integration (per feature)
-- [ ] Login API → tested working
-- [ ] Daily Start API
-- [ ] Cart/Scan API
-- [ ] Payment API
-- [ ] Daily Close API
-- [ ] Report API
-- [ ] Socket.IO customer display
+- [x] Login API → tested working
+- [x] Daily Start API → POST /api/shift/open, real endpoint
+- [x] Cart/Scan API → scan/add, list, void with PIN verification (user_pin table, MD5)
+- [x] Payment API → POST /api/transactions (transaction + detail + payment + balance)
+- [x] Daily Close API → GET /api/shift/summary, POST /api/shift/close
+- [x] Report API → GET /api/transactions?date=&page=&limit= (paginated, with payment type)
+- [x] Socket.IO customer display → server relays display:update to terminal room
 
 ## Phase 4: Final
 - [ ] Full build clean (`ng build --configuration=production`)

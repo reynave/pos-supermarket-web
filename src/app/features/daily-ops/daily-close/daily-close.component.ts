@@ -15,6 +15,7 @@ interface ShiftSummary {
   digitalPayments: number;
   cashExpected: number;
   totalTransactions: number;
+  openingBalance: number;
 }
 
 interface DenominationRow {
@@ -57,6 +58,7 @@ export class DailyCloseComponent {
     digitalPayments: 0,
     cashExpected: 0,
     totalTransactions: 0,
+    openingBalance: 0,
   });
 
   physicalCashTotal = computed(() => {
@@ -85,12 +87,29 @@ export class DailyCloseComponent {
     if (!session?.shiftId) return;
 
     this.loading.set(true);
-    this.http.get<ApiResponse<ShiftSummary>>(
-      `${environment.apiUrl}/shifts/${session.shiftId}/summary`,
+    this.http.get<ApiResponse<any>>(
+      `${environment.apiUrl}/shift/summary/${session.shiftId}`,
     ).subscribe({
       next: (res) => {
         this.loading.set(false);
-        if (res.success && res.data) this.summary.set(res.data);
+        if (res.success && res.data) {
+          const d = res.data;
+          const cashPayments = (d.payments || [])
+            .filter((p: any) => p.paymentTypeId === 'CASH')
+            .reduce((sum: number, p: any) => sum + p.totalAmount, 0);
+          const digitalPayments = (d.payments || [])
+            .filter((p: any) => p.paymentTypeId !== 'CASH' && p.paymentTypeId !== 'DISC.BILL')
+            .reduce((sum: number, p: any) => sum + p.totalAmount, 0);
+
+          this.summary.set({
+            grossSales: d.totalSales || 0,
+            taxCollected: d.totalTax || 0,
+            digitalPayments,
+            cashExpected: (d.openingBalance || 0) + cashPayments,
+            totalTransactions: d.transactionCount || 0,
+            openingBalance: d.openingBalance || 0,
+          });
+        }
       },
       error: () => this.loading.set(false),
     });
@@ -101,7 +120,7 @@ export class DailyCloseComponent {
     if (!session?.shiftId) return;
 
     this.closing.set(true);
-    this.http.post<ApiResponse<null>>(`${environment.apiUrl}/shifts/${session.shiftId}/close`, {
+    this.http.post<ApiResponse<null>>(`${environment.apiUrl}/shift/close/${session.shiftId}`, {
       physicalCash: this.physicalCashTotal(),
       notes: this.shiftNotes,
     }).subscribe({
