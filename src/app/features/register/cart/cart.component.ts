@@ -214,19 +214,41 @@ export class CartComponent implements OnInit, OnDestroy {
 
   /** Confirm voiding selected qty of the item */
   confirmVoidItem(): void {
-    console.log('Confirm void item', this.voidItemIndex(), this.voidItemQty());
     const idx = this.voidItemIndex();
     const qty = this.voidItemQty();
     if (idx < 0 || qty < 1) return;
+
     const item = this.cartService.cart()[idx];
     if (!item) return;
-    if (qty >= item.qty) {
-      this.cartService.removeItem(idx);
-    } else {
-      this.cartService.setQty(idx, item.qty - qty);
-    }
-    this.emitDisplayUpdate();
-    this.cancelVoidItem();
+
+    const kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) return;
+
+    this.loading.set(true);
+    this.cartService.voidItemSession(kioskUuid, {
+      itemId: item.itemId,
+      barcode: item.barcode,
+      qty,
+      reason: 'manual void item',
+    }).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (!res.success) {
+          this.errorMessage.set(res.message || 'Failed to void item');
+          setTimeout(() => this.errorMessage.set(''), 3000);
+          return;
+        }
+
+        // Reload from backend to keep frontend state aligned with DB rows.
+        this.httpGetItem();
+        this.cancelVoidItem();
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.errorMessage.set(err?.error?.message || 'Failed to void item');
+        setTimeout(() => this.errorMessage.set(''), 3000);
+      },
+    });
   }
 
   voidAll(): void {

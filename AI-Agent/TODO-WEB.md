@@ -111,15 +111,15 @@
 - [x] Socket.IO customer display → server relays display:update to terminal room
 
 ## Phase 4: Final
-- [ ] Full build clean (`ng build --configuration=production`)
+- [x] Full build clean (`ng build --configuration=production`)
 - [ ] End-to-end test all screens
 
 ---
 
 ## Last Updated
-- **Date**: 2026-03-30
-- **Last Completed Step**: Phase 2 Complete — Refactored sales-register → cart/payment/receipt (3 komponen terpisah, 3 route). Build clean.
-- **Next Step**: Phase 3 — Backend API Integration testing
+- **Date**: 2026-04-01
+- **Last Completed Step**: Phase 4 partial — Production build verified clean; protected POS transaction routes restored with `authGuard + shiftGuard`.
+- **Next Step**: End-to-end test all screens and full cashier flow against backend.
 
 ### Route Summary
 | Route | Component | Guard |

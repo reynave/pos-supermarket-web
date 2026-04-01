@@ -43,6 +43,13 @@ export interface CartListResponse {
   grandTotal: number;
 }
 
+interface VoidItemPayload {
+  itemId?: string;
+  barcode?: string;
+  qty: number;
+  reason?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private readonly KIOSK_KEY = 'pos_kiosk_uuid';
@@ -106,6 +113,14 @@ export class CartService {
           }
         }),
       );
+  }
+
+  /** POST /api/cart/voidItem/:kioskUuid — void selected qty for one item in cart session */
+  voidItemSession(kioskUuid: string, payload: VoidItemPayload): Observable<ApiResponse<{ kioskUuid: string; qty: number }>> {
+    return this.http.post<ApiResponse<{ kioskUuid: string; qty: number }>>(
+      `${environment.apiUrl}/cart/voidItem/${kioskUuid}`,
+      payload,
+    );
   }
 
   /** Load kioskUuid from localStorage on service init */

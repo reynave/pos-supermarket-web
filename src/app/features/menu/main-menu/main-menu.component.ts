@@ -29,11 +29,10 @@ export class MainMenuComponent implements OnInit, OnDestroy {
   userRole = '';
 
   modules: MenuModule[] = [
-    { icon: 'point_of_sale', title: 'Cart', description: 'Process customer transactions and payments', route: '/cart', requiresShift: true },
-    { icon: 'inventory_2', title: 'Inventory', description: 'Manage stock levels, orders and suppliers', route: '', requiresShift: false },
-    { icon: 'assessment', title: 'Shift Reports', description: 'View daily summaries and cash out reports', route: '/report', requiresShift: false },
-    { icon: 'search', title: 'Product Lookup', description: 'Search prices and availability across branches', route: '', requiresShift: false },
-    { icon: 'card_membership', title: 'Customer Loyalty', description: 'Manage rewards and membership profiles', route: '', requiresShift: false },
+    { icon: 'shopping_cart', title: 'Cart', description: 'Process customer transactions and payments', route: '/cart', requiresShift: true },
+    { icon: 'point_of_sale', title: 'Cash Balance', description: 'Manage cash balances and transactions', route: '', requiresShift: false },
+    { icon: 'user_attributes', title: 'Shift Reports', description: 'View daily summaries and cash out reports', route: '/report', requiresShift: false },
+    { icon: 'event_repeat', title: 'Daily Close Report', description: 'View daily close reports and summaries', route: '', requiresShift: false },
     { icon: 'tune', title: 'Settings', description: 'Hardware, printers and terminal configuration', route: '', requiresShift: false },
   ];
 

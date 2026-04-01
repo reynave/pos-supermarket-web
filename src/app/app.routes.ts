@@ -28,19 +28,19 @@ export const routes: Routes = [
   },
   {
     path: 'cart',
-   // canActivate: [authGuard, shiftGuard],
+    canActivate: [authGuard, shiftGuard],
     loadComponent: () =>
       import('./features/register/cart/cart.component').then((m) => m.CartComponent),
   },
   {
     path: 'payment',
-  //  canActivate: [authGuard, shiftGuard],
+    canActivate: [authGuard, shiftGuard],
     loadComponent: () =>
       import('./features/register/payment/payment.component').then((m) => m.PaymentComponent),
   },
   {
     path: 'receipt',
-  //  canActivate: [authGuard, shiftGuard],
+    canActivate: [authGuard, shiftGuard],
     loadComponent: () =>
       import('./features/register/receipt/receipt.component').then((m) => m.ReceiptComponent),
   },
