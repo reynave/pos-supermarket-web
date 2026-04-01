@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-background-light text-slate-900">
+  <header class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
+   
+    <div class="flex items-center gap-3">
+      <button [routerLink]="['/']" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
+        <span class="material-symbols-outlined">arrow_back</span>  
+      </button>
+      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+        <span class="material-symbols-outlined">point_of_sale</span>
+      </div>
+      <div>
+        <h2 class="text-lg font-bold tracking-tight">Cash Balance</h2>
+        <p class="text-xs text-slate-500">Mutasi kas cash drawer terminal POS</p>
+      </div>
+    </div>
+
+    <div class="flex">
+       <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+        <button class="p-2 hover:bg-slate-100 rounded-lg text-slate-600" (click)="prevDate()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <div class="px-4 text-slate-900 font-bold min-w-[220px] text-center">{{ formattedDate }}</div>
+        <button class="p-2 hover:bg-slate-100 rounded-lg text-slate-600" (click)="nextDate()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+  
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 lg:px-10 py-4 space-y-8">
+   
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs font-bold tracking-widest uppercase text-slate-500 mb-2">Opening</p>
+        <p class="text-sm text-slate-500">Starting Balance</p>
+        <p class="text-2xl font-black mt-2">{{ openingBalance() | currencyIdr }}</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs font-bold tracking-widest uppercase text-emerald-600 mb-2">Cash In</p>
+        <p class="text-sm text-slate-500">Total masuk dari transaksi cash</p>
+        <p class="text-2xl font-black mt-2 text-emerald-700">{{ totalCashIn() | currencyIdr }}</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs font-bold tracking-widest uppercase text-rose-600 mb-2">Cash Out</p>
+        <p class="text-sm text-slate-500">Total keluar dari transaksi cash</p>
+        <p class="text-2xl font-black mt-2 text-rose-700">{{ totalCashOut() | currencyIdr }}</p>
+      </div>
+
+      <div class="relative overflow-hidden rounded-2xl p-5 shadow-lg bg-gradient-to-br from-primary to-primary-dark text-white">
+        <div class="absolute -right-10 -bottom-10 size-32 rounded-full bg-white/15 blur-xl"></div>
+        <p class="text-xs font-bold tracking-widest uppercase text-white/80 mb-2">Current</p>
+        <p class="text-sm text-white/80">Current Cash Balance</p>
+        <p class="text-2xl font-black mt-2 relative z-10">{{ currentCashBalance() | currencyIdr }}</p>
+      </div>
+    </div>
+
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-xl font-bold">Cash Movement</h3>
+        <span class="text-sm text-slate-500">Kas masuk/keluar per transaksi cash</span>
+      </div>
+
+      @if (loading()) {
+        <div class="flex items-center justify-center py-16 text-slate-500">
+          <svg class="animate-spin h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          Memuat data cash balance...
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Date &amp; Time</th>
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Bill No.</th>
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Cash In</th>
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Cash Out</th>
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Cashier</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (row of cashRows(); track row.billNo + '-' + row.dateTime) {
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-5 py-4 font-medium">{{ row.dateTime | date:'medium' }}</td>
+                  <td class="px-5 py-4 font-mono text-primary font-bold">
+                
+                    <a [routerLink]="['/receipt']" [queryParams]="{ id: row.billNo }" routerLinkActive="router-link-active">
+                      {{ row.billNo }}
+                    </a>
+                  </td>
+                  <td class="px-5 py-4">
+                    @if (row.cashIn > 0) {
+                      <span class="font-bold text-emerald-700">{{ row.cashIn | currencyIdr }}</span>
+                    } @else {
+                      <span class="text-slate-400">-</span>
+                    }
+                  </td>
+                  <td class="px-5 py-4">
+                    @if (row.cashOut > 0) {
+                      <span class="font-bold text-rose-700">{{ row.cashOut | currencyIdr }}</span>
+                    } @else {
+                      <span class="text-slate-400">-</span>
+                    }
+                  </td>
+                  <td class="px-5 py-4 text-slate-700">{{ row.cashierName }}</td>
+                </tr>
+              }
+
+              @if (cashRows().length === 0) {
+                <tr>
+                  <td colspan="5" class="px-5 py-14 text-center text-slate-400">
+                    <span class="material-symbols-outlined text-5xl mb-2 block">payments</span>
+                    Belum ada mutasi cash pada tanggal ini.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-sm text-slate-500">
+            Showing <span class="font-bold text-slate-800">{{ cashRows().length }}</span> rows
+            from <span class="font-bold text-slate-800">{{ totalItems() }}</span> transactions
+          </p>
+          <div class="flex gap-2">
+            <button
+              class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold disabled:opacity-50"
+              [disabled]="currentPage() <= 1"
+              (click)="prevPage()">
+              Previous
+            </button>
+            <button
+              class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold"
+              (click)="nextPage()">
+              Next
+            </button>
+          </div>
+        </div>
+      }
+    </section>
+
+    @if (errorMessage()) {
+      <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+        {{ errorMessage() }}
+      </div>
+    }
+  </main>
+</div>

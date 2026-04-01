@@ -49,7 +49,7 @@
           <span class="material-symbols-outlined text-slate-400">barcode_reader</span>
           <input
             class="w-full pl-3 pr-3 py-2 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 placeholder-slate-400 focus:ring-primary focus:border-primary text-lg"
-            placeholder="Scan barcode..." [(ngModel)]="searchQuery" (keydown.enter)="onSearch()"   (blur)="onSearch()" />
+            placeholder="Scan barcode..." [(ngModel)]="searchQuery" (keydown.enter)="onSearch()" (blur)="onSearch()" />
         </div>
 
         <!-- Transaction List Header -->
@@ -147,9 +147,10 @@
               Change</button>
             <button
               class="bg-white border border-slate-200 hover:bg-slate-50 text-xl font-bold rounded-2xl shadow-sm transition-all text-slate-700">Discount</button>
-            <button  class="bg-red-500 text-white border border-slate-200 hover:bg-red-600 text-xl font-bold rounded-2xl shadow-sm transition-all"
-              (click)="voidCart()">Void Cart</button>
-            
+            <button
+              class="bg-red-500 text-white border border-slate-200 hover:bg-red-600 text-xl font-bold rounded-2xl shadow-sm transition-all"
+              (click)="voidCart()">Cancel Transaction</button>
+
             <button
               class="bg-white border border-slate-200 hover:bg-slate-50 text-xl font-bold rounded-2xl shadow-sm transition-all text-slate-700">CUSTOME
               MODE 1</button>
@@ -171,62 +172,77 @@
     <!-- Void Item Modal -->
     @if (showVoidItemModal()) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div class="bg-white rounded-2xl shadow-2xl w-[380px] p-6" (click)="$event.stopPropagation()">
-        <!-- Header -->
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-            <span class="material-symbols-outlined text-red-600 text-2xl">delete</span>
-          </div>
+      <div class="bg-white rounded-2xl shadow-2xl w-[760px] max-w-[95vw] p-6" (click)="$event.stopPropagation()">
+
+
+        <div class="grid grid-cols-2 gap-4">
           <div>
-            <h3 class="text-xl font-bold text-slate-900">Void Item</h3>
-            <p class="text-sm text-slate-500">Remove quantity from this item</p>
-          </div>
-        </div>
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <span class="material-symbols-outlined text-red-600 text-2xl">delete</span>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-900">Void Item</h3>
+                <p class="text-sm text-slate-500">Remove quantity from this item</p>
+              </div>
+            </div>
+            <!-- Item Info -->
+            <div class="mb-4">
+              <div class="font-semibold text-slate-800">
+                {{ cartService.cart()[voidItemIndex()].name || '-' }}
+              </div>
+              <div class="text-xs text-slate-500">
+                Current Qty: <span class="font-bold">{{ cartService.cart()[voidItemIndex()].qty }}</span>
+              </div>
+            </div>
 
-        <!-- Item Info -->
-        <div class="mb-4">
-          <div class="font-semibold text-slate-800">
-            {{ cartService.cart()[voidItemIndex()].name || '-' }}
-          </div>
-          <div class="text-xs text-slate-500">
-            Current Qty: <span class="font-bold">{{ cartService.cart()[voidItemIndex()].qty }}</span>
-          </div>
-        </div>
+            <!-- Qty Selector -->
+            <div class="mb-5">
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Qty to Remove</label>
+              <input type="number" min="1" [max]="cartService.cart()[voidItemIndex()].qty"
+                class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:border-red-500 focus:ring-red-500 focus:outline-none"
+                [value]="voidItemQty()" (input)="voidItemQty.set($any($event.target).valueAsNumber || 1)" />
+            </div>
 
-        <!-- Qty Selector -->
-        <div class="mb-5">
-          <label class="block text-sm font-semibold text-slate-700 mb-1">Qty to Remove</label>
-          <input type="number" min="1"
-            [max]="cartService.cart()[voidItemIndex()].qty"
-            class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:border-red-500 focus:ring-red-500 focus:outline-none"
-            [value]="voidItemQty()"
-            (input)="voidItemQty.set($any($event.target).valueAsNumber || 1)"
-          />
-        </div>
+            <!-- Actions -->
+            <div class="flex gap-3">
+              <button
+                class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+                (click)="cancelVoidItem()">Cancel</button>
+              <button
+                class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                [disabled]="voidItemQty() < 1 || voidItemQty() > (cartService.cart()[voidItemIndex()].qty || 1)"
+                (click)="confirmVoidItem()">Remove</button>
+            </div>
+          </div>
 
-        <!-- Actions -->
-        <div class="flex gap-3">
-          <button
-            class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
-            (click)="cancelVoidItem()">Cancel</button>
-          <button
-            class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            [disabled]="voidItemQty() < 1 || voidItemQty() > (cartService.cart()[voidItemIndex()].qty || 1)"
-            (click)="confirmVoidItem()">Remove</button>
+          <div class="grid grid-cols-3 gap-2">
+            @for (n of [7,8,9,4,5,6,1,2,3]; track n) {
+            <button
+              class="bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all text-slate-800"
+              (click)="onVoidQtyKeypadPress('' + n)">{{ n }}</button>
+            }
+            <button
+              class="bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white active:scale-95 text-lg font-black rounded-xl shadow-sm transition-all uppercase"
+              (click)="onVoidQtyKeypadPress('CLR')">CLR</button>
+            <button
+              class="bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all text-slate-800"
+              (click)="onVoidQtyKeypadPress('0')">0</button>
+            <button
+              class="bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all flex items-center justify-center"
+              (click)="onVoidQtyKeypadPress('backspace')">
+              <span class="material-symbols-outlined text-3xl">backspace</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
     }
     <button
-      class="flex-1 flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-2xl transition-all active:scale-95 shadow-lg"
-      (click)="voidAll()">
-
-      <span class="text-lg font-black uppercase tracking-widest">Void All</span>
-    </button>
-    <button
-      class="flex-[3] flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all active:scale-[0.98] shadow-lg gap-6 disabled:opacity-50"
+      class="flex-1 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all active:scale-[0.98] shadow-lg disabled:opacity-50"
       [disabled]="cartService.cart().length === 0" (click)="openPayment()">
-      <div class="flex flex-col items-start">
+      <div class="flex flex-col items-center">
         <span class="text-lg font-black uppercase tracking-widest">Complete Order</span>
       </div>
 
@@ -244,7 +260,7 @@
         <span class="material-symbols-outlined text-red-600 text-2xl">warning</span>
       </div>
       <div>
-        <h3 class="text-xl font-bold text-slate-900">Void Cart</h3>
+        <h3 class="text-xl font-bold text-slate-900">Cancel Transaction</h3>
         <p class="text-sm text-slate-500">This action cannot be undone</p>
       </div>
     </div>
@@ -257,15 +273,12 @@
     <!-- Verification Code Input -->
     <div class="mb-5">
       <label class="block text-sm font-semibold text-slate-700 mb-1">Verification Code</label>
-     <input type="password" appAutoFocus
-  autocomplete="off"
-  class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:border-red-500 focus:ring-red-500 focus:outline-none"
-  placeholder="Enter verification code..."
-  [value]="voidVerificationId()"
-  (input)="voidVerificationId.set($any($event.target).value)"
-/>
+      <input type="password" appAutoFocus autocomplete="off"
+        class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:border-red-500 focus:ring-red-500 focus:outline-none"
+        placeholder="Enter verification code..." [value]="voidVerificationId()"
+        (input)="voidVerificationId.set($any($event.target).value)" />
     </div>
-  
+
     <!-- error message -->
     <div *ngIf="errorMessage()" class="text-red-600 text-sm mb-4">
       {{ errorMessage() }}
@@ -278,8 +291,68 @@
         (click)="cancelVoidCart()">Cancel</button>
       <button
         class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        [disabled]="!voidVerificationId().trim()"
-        (click)="confirmVoidCart()">Void Cart</button>
+        [disabled]="!voidVerificationId().trim()" (click)="confirmVoidCart()">Confirm</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Add Qty Modal -->
+@if (showAddQtyModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div class="bg-white rounded-2xl shadow-2xl w-[760px] max-w-[95vw] p-6" (click)="$event.stopPropagation()">
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+            <span class="material-symbols-outlined text-emerald-600 text-2xl">add_shopping_cart</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">Add Qty Item</h3>
+            <p class="text-sm text-slate-500">Duplicate item terpilih ke keranjang</p>
+          </div>
+        </div>
+        <div class="mb-4 text-slate-700">
+          <p class="font-semibold">{{ cartService.cart()[cartService.selectedIndex()]?.name || '-' }}</p>
+          <p class="text-xs text-slate-500">Masukkan qty tambahan yang ingin diinsert.</p>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Qty to Add</label>
+          <input type="text" appAutoFocus
+            class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-lg focus:border-emerald-500 focus:ring-emerald-500 focus:outline-none"
+            [value]="addQtyValue()" (input)="addQtyValue.set($any($event.target).valueAsNumber || 1)" />
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+            (click)="cancelAddQty()">Cancel</button>
+          <button
+            class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            [disabled]="addQtyValue() < 1" (click)="confirmAddQty()">Add Qty</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        @for (n of [7,8,9,4,5,6,1,2,3]; track n) {
+        <button
+          class="bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all text-slate-800"
+          (click)="onAddQtyKeypadPress('' + n)">{{ n }}</button>
+        }
+        <button
+          class="bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white active:scale-95 text-lg font-black rounded-xl shadow-sm transition-all uppercase"
+          (click)="onAddQtyKeypadPress('CLR')">CLR</button>
+        <button
+          class="bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all text-slate-800"
+          (click)="onAddQtyKeypadPress('0')">0</button>
+        <button
+          class="bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 active:scale-95 text-2xl font-bold rounded-xl shadow-sm transition-all flex items-center justify-center"
+          (click)="onAddQtyKeypadPress('backspace')">
+          <span class="material-symbols-outlined text-3xl">backspace</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

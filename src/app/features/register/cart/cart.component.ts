@@ -30,6 +30,10 @@ export class CartComponent implements OnInit, OnDestroy {
   showVoidModal = signal(false);
   voidVerificationId = signal('');
 
+  // Add Qty modal
+  showAddQtyModal = signal(false);
+  addQtyValue = signal(1);
+
   // Void Item modal
   showVoidItemModal = signal(false);
   voidItemQty = signal(1);
@@ -185,11 +189,60 @@ export class CartComponent implements OnInit, OnDestroy {
 
   setQty(): void {
     const idx = this.cartService.selectedIndex();
-    const qty = parseInt(this.keypadInput(), 10);
-    if (idx < 0 || !qty || qty < 1) return;
-    this.cartService.setQty(idx, qty);
-    this.keypadInput.set('0');
-    this.emitDisplayUpdate();
+    if (idx < 0) {
+      this.errorMessage.set('Pilih item dulu sebelum input qty');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    const fromKeypad = parseInt(this.keypadInput(), 10);
+    this.addQtyValue.set(!Number.isNaN(fromKeypad) && fromKeypad > 0 ? fromKeypad : 1);
+    this.showAddQtyModal.set(true);
+  }
+
+  cancelAddQty(): void {
+    this.showAddQtyModal.set(false);
+    this.addQtyValue.set(1);
+  }
+
+  onVoidQtyKeypadPress(key: string): void {
+    const current = String(this.voidItemQty() || 0);
+    this.voidItemQty.set(this.applyModalKeypad(current, key));
+  }
+
+  onAddQtyKeypadPress(key: string): void {
+    const current = String(this.addQtyValue() || 0);
+    this.addQtyValue.set(this.applyModalKeypad(current, key));
+  }
+
+  confirmAddQty(): void {
+    const idx = this.cartService.selectedIndex();
+    const qty = this.addQtyValue();
+    const selected = this.cartService.cart()[idx];
+    const kioskUuid = this.cartService.kioskUuid();
+
+    if (idx < 0 || !selected || qty < 1 || !kioskUuid) return;
+
+    this.loading.set(true);
+    this.itemService.addQtyBySelected(kioskUuid, selected.itemId, qty, selected.barcode).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (!res) {
+          this.errorMessage.set('Gagal menambah qty item');
+          setTimeout(() => this.errorMessage.set(''), 3000);
+          return;
+        }
+
+        this.cancelAddQty();
+        this.keypadInput.set('0');
+        this.httpGetItem();
+      },
+      error: () => {
+        this.loading.set(false);
+        this.errorMessage.set('Gagal menambah qty item');
+        setTimeout(() => this.errorMessage.set(''), 3000);
+      },
+    });
   }
 
   // --- Void ---
@@ -251,11 +304,6 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-  voidAll(): void {
-    this.cartService.clearCart();
-    this.emitDisplayUpdate();
-  }
-
   /** Open the Void Cart confirmation modal */
   voidCart(): void {
     const kioskUuid = this.cartService.kioskUuid();
@@ -313,6 +361,25 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private updateClock(): void {
     this.currentTime.set(new Date().toLocaleTimeString('en-US', { hour12: false }));
+  }
+
+  private applyModalKeypad(currentValue: string, key: string): number {
+    let nextValue = currentValue;
+
+    if (key === 'CLR') {
+      return '' as unknown as number; // Signal will be reset to empty string, which is treated as 0 in display
+    }
+
+    if (key === 'backspace') {
+      nextValue = currentValue.length > 1 ? currentValue.slice(0, -1) : '0';
+    } else {
+      nextValue = currentValue === '0' ? key : currentValue + key;
+    }
+
+    const parsed = parseInt(nextValue, 10);
+    if (Number.isNaN(parsed) || parsed < 1) return 1;
+    if (parsed > 999) return 999;
+    return parsed;
   }
 
   private emitDisplayUpdate(): void {

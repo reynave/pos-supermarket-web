@@ -64,4 +64,9 @@ export class LoginComponent {
         },
       });
   }
+
+  goToSetup(){
+  this.router.navigate(['/startup']);
+   // history.back(); // Kembali ke halaman sebelumnya (setup) jika pengguna ingin mengubah konfigurasi koneksi
+  }
 }

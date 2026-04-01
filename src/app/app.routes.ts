@@ -4,6 +4,11 @@ import { shiftGuard } from './core/guards/shift.guard';
 
 export const routes: Routes = [
   {
+    path: 'startup',
+    loadComponent: () =>
+      import('./features/startup/startup.component').then((m) => m.StartupComponent),
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./features/auth/login/login.component').then((m) => m.LoginComponent),
@@ -51,10 +56,16 @@ export const routes: Routes = [
       import('./features/report/daily-report/daily-report.component').then((m) => m.DailyReportComponent),
   },
   {
+    path: 'cash-balance',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/report/cash-balance/cash-balance.component').then((m) => m.CashBalanceComponent),
+  },
+  {
     path: 'display',
     loadComponent: () =>
       import('./features/display/customer-display/customer-display.component').then((m) => m.CustomerDisplayComponent),
   },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: '**', redirectTo: '/login' },
+  { path: '', redirectTo: '/startup', pathMatch: 'full' },
+  { path: '**', redirectTo: '/startup' },
 ];

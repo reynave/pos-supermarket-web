@@ -1,5 +1,6 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
@@ -11,31 +12,60 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { Transaction } from '../../../core/models/transaction.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
+export interface PaymentType {
+  id: string;
+  label: string;
+  name: string;
+  image: string;
+  edc: number;
+  isLock: number;
+}
+
+export interface PaidEntry {
+  id: number;
+  paymentTypeId: string;
+  paymentLabel: string;
+  paymentName: string;
+  paid: number;
+}
+
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [CommonModule, CurrencyIdrPipe],
+  imports: [CommonModule, FormsModule, CurrencyIdrPipe],
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css',
 })
 export class PaymentComponent implements OnInit {
-  paymentMethod = signal<'cash' | 'card' | 'qris'>('cash');
-  cashReceived = signal('0');
+  private readonly KIOSK_KEY = 'pos_kiosk_uuid';
+
+  // Payment type panel
+  paymentTypes = signal<PaymentType[]>([]);
+  selectedTypeId = signal<string>('CASH');
+
+  // Entry amount keypad
+  entryAmount = signal('0');
+
+  // Paid entries table
+  paidEntries = signal<PaidEntry[]>([]);
+  totalPaid = signal(0);
+
+  // Loading / error
   paymentLoading = signal(false);
+  addLoading = signal(false);
+  completeLoading = signal(false);
   errorMessage = signal('');
 
   userName = '';
-  terminalId = environment.terminalId;
 
-  changeDue = computed(() => {
-    const received = parseFloat(this.cashReceived()) || 0;
-    return Math.max(0, received - this.cartService.grandTotal());
-  });
+  // Remaining amount still needed
+  remaining = computed(() => Math.max(0, this.cartService.grandTotal() - this.totalPaid()));
 
-  canCompleteCash = computed(() => {
-    const received = parseFloat(this.cashReceived()) || 0;
-    return received >= this.cartService.grandTotal();
-  });
+  // Whether total paid covers the bill
+  isPaid = computed(() => this.totalPaid() >= this.cartService.grandTotal());
+
+  // Change due (only meaningful if cash overpaid)
+  changeDue = computed(() => Math.max(0, this.totalPaid() - this.cartService.grandTotal()));
 
   constructor(
     private router: Router,
@@ -47,79 +77,228 @@ export class PaymentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // If no items in cart, redirect back
-   /* if (this.cartService.cart().length === 0) {
-      this.router.navigate(['/cart']);
-      return;
-    }*/
     const user = this.authService.currentUser();
     this.userName = user?.name ?? 'Cashier';
+    this.loadPaymentTypes();
+    this.restoreSessionAndTotals();
   }
 
-  selectPaymentMethod(method: 'cash' | 'card' | 'qris'): void {
-    this.paymentMethod.set(method);
-    this.cashReceived.set('0');
-  }
-
-  onCashKey(key: string): void {
-    const current = this.cashReceived();
-    if (key === 'backspace') {
-      this.cashReceived.set(current.length > 1 ? current.slice(0, -1) : '0');
-      return;
+  private restoreSessionAndTotals(): void {
+    // Prefer in-memory signal, then fallback to localStorage when page is refreshed.
+    let kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) {
+      kioskUuid = localStorage.getItem(this.KIOSK_KEY) ?? '';
+      if (kioskUuid) {
+        this.cartService.setKioskUuid(kioskUuid);
+      }
     }
-    if (current === '0') {
-      this.cashReceived.set(key);
-    } else {
-      this.cashReceived.set(current + key);
-    }
-  }
 
-  setExactAmount(): void {
-    this.cashReceived.set(String(this.cartService.grandTotal()));
-  }
+    if (!kioskUuid) return;
 
-  completePayment(): void {
-    const method = this.paymentMethod();
-    if (method === 'cash') {
-      const received = parseFloat(this.cashReceived()) || 0;
-      if (received < this.cartService.grandTotal()) return;
-    }
     this.paymentLoading.set(true);
-
-    const session = this.sessionService.session();
-    const paymentTypeMap: Record<string, string> = { cash: 'CASH', card: 'DEBITCC', qris: 'QRIS' };
-    const body: Record<string, unknown> = {
-      kioskUuid: this.cartService.kioskUuid(),
-      terminalId: environment.terminalId,
-      settlementId: session?.settlementId || session?.shiftId || '',
-      payments: [{
-        paymentTypeId: paymentTypeMap[method],
-        amount: this.cartService.grandTotal(),
-        reference: '',
-      }],
-    };
-
-    // For cash, include actual tendered amount so backend can calculate change
-    if (method === 'cash') {
-      body['cashReceived'] = parseFloat(this.cashReceived()) || 0;
-    }
-
-    this.http.post<ApiResponse<Transaction>>(`${environment.apiUrl}/transactions`, body).subscribe({
-      next: (res) => {
+    this.cartService.loadCart(kioskUuid).subscribe({
+      next: () => {
         this.paymentLoading.set(false);
-        if (res.success && res.data) {
-          this.cartService.saveForReceipt(res.data, method);
-          this.cartService.clearKioskUuid(); // remove kioskUuid from localStorage after payment
-          this.socketService.emit('display:update', { items: [], subtotal: 0, tax: 0, total: 0 });
-          this.router.navigate(['/receipt']);
-        }
+        this.loadPendingPayments();
       },
-      error: (err) => {
+      error: () => {
         this.paymentLoading.set(false);
-        this.errorMessage.set(err?.error?.message || 'Payment failed');
+        this.errorMessage.set('Gagal memuat ulang total tagihan');
         setTimeout(() => this.errorMessage.set(''), 3000);
       },
     });
+  }
+
+  // ─── Payment Types ────────────────────────────────────────────────────────
+
+  private loadPaymentTypes(): void {
+    this.http.get<ApiResponse<PaymentType[]>>(`${environment.apiUrl}/payment/types`).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          // Filter out EDC/internal types for simple UI; keep CASH, DEBITCC, QRIS etc.
+          const visible = res.data.filter((t) => t.isLock === 1);
+          this.paymentTypes.set(visible);
+          if (visible.length && !visible.find((t) => t.id === this.selectedTypeId())) {
+            this.selectedTypeId.set(visible[0].id);
+          }
+        }
+      },
+      error: () => {
+        // Fallback to static list if API fails
+        this.paymentTypes.set([
+          { id: 'CASH', label: 'CASH', name: 'Cash', image: '', edc: 0, isLock: 1 },
+          { id: 'DEBITCC', label: 'MANUAL DEBIT CARD', name: 'Debit / Card', image: '', edc: 0, isLock: 1 },
+          { id: 'QRISTELKOM', label: 'QRIS TELKOM', name: 'QRIS', image: '', edc: 0, isLock: 1 },
+        ]);
+      },
+    });
+  }
+
+  selectType(id: string): void {
+    this.selectedTypeId.set(id);
+    // Pre-fill remaining amount when selecting a payment type
+    const remaining = this.remaining();
+    this.entryAmount.set(remaining > 0 ? String(remaining) : '0');
+  }
+
+  // ─── Keypad ───────────────────────────────────────────────────────────────
+
+  onKey(key: string): void {
+    const current = this.entryAmount();
+    if (key === 'backspace') {
+      this.entryAmount.set(current.length > 1 ? current.slice(0, -1) : '0');
+      return;
+    }
+    if (key === 'CLR') {
+      this.entryAmount.set('0');
+      return;
+    }
+    if (current === '0') {
+      this.entryAmount.set(key);
+    } else {
+      this.entryAmount.set(current + key);
+    }
+  }
+
+  setExactRemaining(): void {
+    this.entryAmount.set(String(this.remaining()));
+  }
+
+  setExactTotal(): void {
+    this.entryAmount.set(String(this.cartService.grandTotal()));
+  }
+
+  // ─── Pending Payments ─────────────────────────────────────────────────────
+
+  private loadPendingPayments(): void {
+    const kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) return;
+    this.http
+      .get<ApiResponse<{ payments: PaidEntry[]; totalPaid: number }>>(
+        `${environment.apiUrl}/payment/pending/${kioskUuid}`,
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.paidEntries.set(res.data.payments);
+            this.totalPaid.set(res.data.totalPaid);
+          }
+        },
+        error: () => {},
+      });
+  }
+
+  addPayment(): void {
+    const paid = parseInt(this.entryAmount(), 10);
+    if (!paid || paid < 1) {
+      this.errorMessage.set('Jumlah pembayaran tidak valid');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    const kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) return;
+
+    this.addLoading.set(true);
+    this.http
+      .post<ApiResponse<{ id: number; payments: PaidEntry[]; totalPaid: number }>>(
+        `${environment.apiUrl}/payment/add`,
+        {
+          kioskUuid,
+          paymentTypeId: this.selectedTypeId(),
+          paid,
+        },
+      )
+      .subscribe({
+        next: (res) => {
+          this.addLoading.set(false);
+          if (res.success && res.data) {
+            this.paidEntries.set(res.data.payments);
+            this.totalPaid.set(res.data.totalPaid);
+            this.entryAmount.set('0');
+          } else {
+            this.errorMessage.set('Gagal menambah pembayaran');
+            setTimeout(() => this.errorMessage.set(''), 3000);
+          }
+        },
+        error: (err) => {
+          this.addLoading.set(false);
+          this.errorMessage.set(err?.error?.message || 'Gagal menambah pembayaran');
+          setTimeout(() => this.errorMessage.set(''), 3000);
+        },
+      });
+  }
+
+  removePayment(entry: PaidEntry): void {
+    const kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) return;
+
+    this.http
+      .delete<ApiResponse<{ payments: PaidEntry[]; totalPaid: number }>>(
+        `${environment.apiUrl}/payment/${entry.id}`,
+        { body: { kioskUuid } },
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.paidEntries.set(res.data.payments);
+            this.totalPaid.set(res.data.totalPaid);
+          }
+        },
+        error: (err) => {
+          this.errorMessage.set(err?.error?.message || 'Gagal menghapus pembayaran');
+          setTimeout(() => this.errorMessage.set(''), 3000);
+        },
+      });
+  }
+
+  // ─── Complete ─────────────────────────────────────────────────────────────
+
+  completePayment(): void {
+    if (!this.isPaid()) return;
+
+    const kioskUuid = this.cartService.kioskUuid();
+    const session = this.sessionService.session();
+    if (!kioskUuid || !session) return;
+
+    const cashEntry = this.paidEntries().find((e) => e.paymentTypeId === 'CASH');
+    const body: Record<string, unknown> = {
+      kioskUuid,
+      terminalId: environment.terminalId,
+      settlementId: session.settlementId || session.shiftId || '',
+    };
+    if (cashEntry) body['cashReceived'] = this.totalPaid();
+
+    this.completeLoading.set(true);
+
+    this.http.post<ApiResponse<Transaction>>(`${environment.apiUrl}/payment/complete`, body).subscribe({
+      next: (res) => {
+        this.completeLoading.set(false);
+        if (res.success && res.data) {
+          const primaryMethod = this.paidEntries()[0]?.paymentTypeId?.toLowerCase() ?? 'cash';
+          this.cartService.saveForReceipt(res.data, primaryMethod);
+          this.cartService.clearKioskUuid();
+          this.socketService.emit('display:update', { items: [], subtotal: 0, tax: 0, total: 0 });
+          this.router.navigate(['/receipt'], { queryParams: { id: res.data.id }, replaceUrl: true });
+        } else {
+          this.errorMessage.set('Pembayaran gagal diselesaikan');
+          setTimeout(() => this.errorMessage.set(''), 4000);
+        }
+      },
+      error: (err) => {
+        this.completeLoading.set(false);
+        this.errorMessage.set(err?.error?.message || 'Pembayaran gagal diselesaikan');
+        setTimeout(() => this.errorMessage.set(''), 4000);
+      },
+    });
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  paymentTypeIcon(id: string): string {
+    if (id === 'CASH') return 'payments';
+    if (id.includes('QRIS')) return 'qr_code_2';
+    return 'credit_card';
   }
 
   goBack(): void {

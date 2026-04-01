@@ -67,6 +67,11 @@ export class DailyReportComponent implements OnInit {
     this.router.navigate(['/menu']);
   }
 
+  openReceipt(trxId: string): void {
+    if (!trxId) return;
+    this.router.navigate(['/receipt'], { queryParams: { id: trxId } });
+  }
+
   getPaymentBadgeClass(status: number): string {
     switch (status) {
       case 1: return 'bg-blue-100 text-blue-700';

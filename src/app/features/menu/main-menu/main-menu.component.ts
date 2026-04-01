@@ -30,7 +30,7 @@ export class MainMenuComponent implements OnInit, OnDestroy {
 
   modules: MenuModule[] = [
     { icon: 'shopping_cart', title: 'Cart', description: 'Process customer transactions and payments', route: '/cart', requiresShift: true },
-    { icon: 'point_of_sale', title: 'Cash Balance', description: 'Manage cash balances and transactions', route: '', requiresShift: false },
+    { icon: 'point_of_sale', title: 'Cash Balance', description: 'Manage cash balances and transactions', route: '/cash-balance', requiresShift: false },
     { icon: 'user_attributes', title: 'Shift Reports', description: 'View daily summaries and cash out reports', route: '/report', requiresShift: false },
     { icon: 'event_repeat', title: 'Daily Close Report', description: 'View daily close reports and summaries', route: '', requiresShift: false },
     { icon: 'tune', title: 'Settings', description: 'Hardware, printers and terminal configuration', route: '', requiresShift: false },

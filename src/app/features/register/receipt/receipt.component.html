@@ -20,6 +20,13 @@
     </div>
   </header>
 
+  @if (loadError) {
+    <div class="bg-red-50 border-b border-red-200 text-red-700 px-6 py-2 text-sm font-medium flex items-center gap-2">
+      <span class="material-symbols-outlined text-lg">error</span>
+      {{ loadError }}
+    </div>
+  }
+
   <!-- Content -->
   <div class="flex-1 overflow-hidden flex p-8 gap-8 max-w-6xl mx-auto w-full">
     <!-- Receipt Preview -->
@@ -79,6 +86,16 @@
         <div class="text-left">
           <p class="text-lg font-bold leading-none">EMAIL RECEIPT</p>
           <p class="text-sm text-slate-500">Send to inbox</p>
+        </div>
+      </button>
+
+       <button
+        class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors active:scale-95"
+        (click)="goToMenu()">
+        <span class="material-symbols-outlined text-primary text-3xl">home</span>
+        <div class="text-left">
+          <p class="text-lg font-bold leading-none">BACK MENU</p>
+          <p class="text-sm text-slate-500">Return to main menu</p>
         </div>
       </button>
       <div class="mt-auto">

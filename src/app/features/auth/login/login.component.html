@@ -1,29 +1,5 @@
 <div class="login-page bg-background-light min-h-screen flex flex-col items-center justify-center p-6 relative">
-  <!-- Top Navigation / Status Bar -->
-  <header class="fixed top-0 left-0 w-full px-8 py-6 flex items-center justify-between pointer-events-none z-10">
-    <div
-      class="flex items-center gap-3 bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full shadow-sm border border-slate-200 pointer-events-auto">
-      <div class="flex items-center gap-2 text-primary">
-        <span class="material-symbols-outlined text-2xl">shopping_cart</span>
-        <span class="font-bold text-lg tracking-tight text-slate-900">Supermarket POS</span>
-      </div>
-    </div>
-    <div
-      class="flex items-center gap-4 bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-full shadow-sm border border-slate-200 pointer-events-auto">
-      <div class="flex items-center gap-2">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-        </span>
-        <span class="text-sm font-semibold text-slate-700">System Status: Online</span>
-      </div>
-      <div class="h-4 w-px bg-slate-200"></div>
-      <div class="flex items-center gap-2 text-slate-500">
-        <span class="material-symbols-outlined text-xl">wifi</span>
-        <span class="material-symbols-outlined text-xl">schedule</span>
-      </div>
-    </div>
-  </header>
+  
 
   <!-- Main Login Card -->
   <main class="w-full max-w-[540px]">
@@ -119,6 +95,16 @@
             <span class="material-symbols-outlined text-3xl">login</span>
           }
         </button>
+
+        <!-- bukan tombol back ke setup -->
+        <button
+          type="button"
+          (click)="goToSetup()"
+          class="w-full h-12 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-2xl transition-colors flex items-center justify-center gap-2 mt-2">
+          <span class="material-symbols-outlined text-sm">settings</span>
+          Setup Connection
+        </button>
+
       </form>
     </div>
 
@@ -136,26 +122,7 @@
           V {{ appVersion }}
         </div>
       </div>
-      <div class="w-full flex justify-center gap-8 border-t border-slate-200 pt-8 opacity-60">
-        <div class="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
-          <div class="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">contactless</span>
-          </div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">NFC Ready</span>
-        </div>
-        <div class="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
-          <div class="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">print</span>
-          </div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Printer Active</span>
-        </div>
-        <div class="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
-          <div class="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">qr_code_scanner</span>
-          </div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Scanner OK</span>
-        </div>
-      </div>
+      
     </div>
   </main>
 

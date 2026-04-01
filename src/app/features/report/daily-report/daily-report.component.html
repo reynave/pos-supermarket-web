@@ -67,7 +67,9 @@
                   </td>
                   <td class="px-6 py-5 text-right font-bold text-slate-900">{{ trx.grandTotal | currencyIdr }}</td>
                   <td class="px-6 py-5 text-center">
-                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-primary hover:text-white transition-all rounded-lg text-primary text-sm font-bold">
+                    <button
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-primary hover:text-white transition-all rounded-lg text-primary text-sm font-bold"
+                      (click)="openReceipt(trx.id)">
                       <span class="material-symbols-outlined text-lg">visibility</span>
                       Detail
                     </button>

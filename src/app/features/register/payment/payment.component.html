@@ -31,137 +31,179 @@
   }
 
   <!-- Content -->
-  <div class="flex-1 overflow-y-auto p-8">
-    <div class="max-w-5xl mx-auto grid grid-cols-12 gap-8">
-      <!-- Left: Payment methods -->
-      <div class="col-span-8 flex flex-col gap-6">
-        <div class="bg-white p-8 rounded-xl border border-slate-200 flex flex-col items-center text-center shadow-sm">
-          <p class="text-slate-500 font-medium uppercase tracking-wider text-sm mb-2">Total Amount Due</p>
-          <h1 class="text-6xl font-black text-primary tracking-tight">{{ cartService.grandTotal() | currencyIdr }}</h1>
-        </div>
+  <div class="flex-1 flex overflow-hidden">
 
-        <h2 class="text-xl font-bold flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary">payments</span>
-          Select Payment Method
-        </h2>
-        <div class="grid grid-cols-3 gap-4">
-          <div
-            class="group cursor-pointer bg-white border-2 rounded-xl p-6 flex flex-col items-center justify-center gap-4 transition-all hover:shadow-md"
-            [ngClass]="paymentMethod() === 'cash' ? 'border-primary ring-4 ring-orange-100' : 'border-slate-200'"
-            (click)="selectPaymentMethod('cash')">
-            <div class="h-16 w-16 rounded-full flex items-center justify-center transition-all"
-              [ngClass]="paymentMethod() === 'cash' ? 'bg-orange-100 text-primary' : 'bg-slate-100 text-slate-600'">
-              <span class="material-symbols-outlined text-4xl">payments</span>
-            </div>
-            <p class="font-bold text-lg">Cash</p>
-          </div>
-          <div
-            class="group cursor-pointer bg-white border-2 rounded-xl p-6 flex flex-col items-center justify-center gap-4 transition-all hover:shadow-md"
-            [ngClass]="paymentMethod() === 'card' ? 'border-primary ring-4 ring-orange-100' : 'border-slate-200'"
-            (click)="selectPaymentMethod('card')">
-            <div class="h-16 w-16 rounded-full flex items-center justify-center transition-all"
-              [ngClass]="paymentMethod() === 'card' ? 'bg-orange-100 text-primary' : 'bg-slate-100 text-slate-600'">
-              <span class="material-symbols-outlined text-4xl">credit_card</span>
-            </div>
-            <p class="font-bold text-lg">Card</p>
-          </div>
-          <div
-            class="group cursor-pointer bg-white border-2 rounded-xl p-6 flex flex-col items-center justify-center gap-4 transition-all hover:shadow-md"
-            [ngClass]="paymentMethod() === 'qris' ? 'border-primary ring-4 ring-orange-100' : 'border-slate-200'"
-            (click)="selectPaymentMethod('qris')">
-            <div class="h-16 w-16 rounded-full flex items-center justify-center transition-all"
-              [ngClass]="paymentMethod() === 'qris' ? 'bg-orange-100 text-primary' : 'bg-slate-100 text-slate-600'">
-              <span class="material-symbols-outlined text-4xl">qr_code_2</span>
-            </div>
-            <p class="font-bold text-lg">QRIS</p>
-          </div>
-        </div>
+    <!-- LEFT: Payment type selector + keypad -->
+    <section class="w-[55%] flex flex-col border-r border-slate-200 overflow-y-auto p-6 gap-5">
+
+      <!-- Total due -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center justify-between shadow-sm">
+        <p class="text-slate-500 font-semibold uppercase tracking-widest text-sm">Total Tagihan</p>
+        <span class="text-4xl font-black text-slate-900 font-mono tracking-tight">{{ cartService.grandTotal() | currencyIdr }}</span>
       </div>
 
-      <!-- Right: Cash Entry / QR / Card -->
-      <div class="col-span-4">
-        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-          @if (paymentMethod() === 'cash') {
-            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary">keyboard</span>
-              Cash Entry
-            </h3>
-            <div class="bg-slate-100 p-4 rounded-xl mb-6 text-right">
-              <p class="text-xs text-slate-500 mb-1">Received Amount</p>
-              <p class="text-4xl font-black font-mono">{{ +cashReceived() | currencyIdr }}</p>
-            </div>
-            <div class="grid grid-cols-3 gap-3">
-              @for (n of [1,2,3,4,5,6,7,8,9,0]; track n) {
-                <button class="h-16 rounded-xl bg-slate-50 hover:bg-slate-200 font-bold text-xl transition-colors" (click)="onCashKey('' + n)">{{ n }}</button>
-              }
-              <button class="h-16 rounded-xl bg-slate-50 hover:bg-slate-200 font-bold text-xl transition-colors" (click)="onCashKey('00')">00</button>
-              <button class="h-16 rounded-xl bg-slate-50 hover:bg-slate-200 flex items-center justify-center transition-colors" (click)="onCashKey('backspace')">
-                <span class="material-symbols-outlined">backspace</span>
-              </button>
-            </div>
-            <div class="mt-6 flex flex-col gap-3">
-              <button class="w-full h-12 rounded-lg bg-white border border-slate-200 font-bold hover:bg-orange-50 hover:border-primary transition-colors" (click)="setExactAmount()">Exact Amount</button>
-              <div class="flex justify-between items-center px-2">
-                <span class="text-slate-500">Change Due:</span>
-                <span class="text-2xl font-bold text-green-600">{{ changeDue() | currencyIdr }}</span>
-              </div>
-              <button
-                class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-xl text-xl shadow-lg shadow-orange-200 flex items-center justify-center gap-2 disabled:opacity-50"
-                [disabled]="paymentLoading() || !canCompleteCash()"
-                (click)="completePayment()">
-                @if (paymentLoading()) {
-                  <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                  </svg>
-                  Processing...
-                } @else {
-                  Complete Payment
-                  <span class="material-symbols-outlined">check_circle</span>
-                }
-              </button>
-            </div>
-          } @else if (paymentMethod() === 'qris') {
-            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary">qr_code_2</span>
-              QRIS Payment
-            </h3>
-            <div class="flex flex-col items-center gap-4 py-6">
-              <div class="w-48 h-48 bg-slate-100 border-2 border-slate-200 rounded-xl flex items-center justify-center">
-                <span class="material-symbols-outlined text-8xl text-slate-300">qr_code_2</span>
-              </div>
-              <div class="flex items-center gap-3 px-6 py-2 rounded-full border border-orange-200 bg-orange-50">
-                <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                </span>
-                <span class="text-sm font-medium">Waiting for scan...</span>
-              </div>
-              <button
-                class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-xl text-xl shadow-lg shadow-orange-200 mt-4 disabled:opacity-50"
-                [disabled]="paymentLoading()"
-                (click)="completePayment()">
-                Confirm Payment
-              </button>
-            </div>
-          } @else {
-            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary">credit_card</span>
-              Card Payment
-            </h3>
-            <div class="flex flex-col items-center gap-4 py-6">
-              <span class="material-symbols-outlined text-8xl text-slate-300">contactless</span>
-              <p class="text-slate-500 text-center">Tap, insert, or swipe the card on reader</p>
-              <button
-                class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-xl text-xl shadow-lg shadow-orange-200 mt-4 disabled:opacity-50"
-                [disabled]="paymentLoading()"
-                (click)="completePayment()">
-                Confirm Payment
-              </button>
-            </div>
+      <!-- Payment type buttons -->
+      <div>
+        <p class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Jenis Pembayaran</p>
+        <div class="flex flex-wrap gap-3">
+          @for (type of paymentTypes(); track type.id) {
+            <button
+              class="flex items-center gap-2 px-4 py-3 rounded-xl border-2 font-bold text-sm transition-all"
+              [ngClass]="selectedTypeId() === type.id ? 'bg-orange-50 border-primary text-primary' : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'"
+              (click)="selectType(type.id)">
+              <span class="material-symbols-outlined text-xl">{{ paymentTypeIcon(type.id) }}</span>
+              {{ type.label }}
+            </button>
           }
         </div>
       </div>
-    </div>
+
+      <!-- Amount entry display -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-inner px-6 py-4 flex flex-col items-end">
+        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">Jumlah Dibayar</span>
+        <span class="text-4xl font-black font-mono text-slate-900">{{ +entryAmount() | currencyIdr }}</span>
+      </div>
+
+      <!-- Keypad -->
+      <div class="grid grid-cols-4 gap-2">
+        @for (n of [7,8,9,4,5,6,1,2,3]; track n) {
+          <button
+            class="h-14 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-2xl shadow-sm transition-all"
+            (click)="onKey('' + n)">{{ n }}</button>
+        }
+        <button
+          class="h-14 bg-red-50 text-red-500 border border-red-100 hover:bg-red-500 hover:text-white active:scale-95 font-black rounded-2xl shadow-sm transition-all uppercase text-base"
+          (click)="onKey('CLR')">CLR</button>
+        <button
+          class="h-14 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-2xl shadow-sm transition-all"
+          (click)="onKey('0')">0</button>
+        <button
+          class="h-14 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-2xl shadow-sm transition-all"
+          (click)="onKey('00')">00</button>
+        <button
+          class="h-14 bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 active:scale-95 rounded-2xl shadow-sm transition-all flex items-center justify-center"
+          (click)="onKey('backspace')">
+          <span class="material-symbols-outlined text-3xl">backspace</span>
+        </button>
+      </div>
+
+      <!-- Quick amount shortcuts -->
+      <div class="flex gap-2">
+        <button
+          class="flex-1  py-3 bg-white border border-slate-200 hover:bg-orange-50 hover:border-primary text-sm font-bold rounded-xl transition-colors"
+          (click)="setExactRemaining()">Sisa Tagihan</button>
+        <button
+          class="flex-1   py-3 bg-white border border-slate-200 hover:bg-orange-50 hover:border-primary text-sm font-bold rounded-xl transition-colors"
+          (click)="setExactTotal()">Total Penuh</button>
+      </div>
+
+      <!-- Add Payment button -->
+      <button
+        class="w-full py-5  bg-primary hover:bg-primary-dark text-white font-bold text-lg rounded-2xl shadow-lg shadow-orange-100 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+        [disabled]="addLoading() || +entryAmount() < 1"
+        (click)="addPayment()">
+        @if (addLoading()) {
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        }
+        <span class="material-symbols-outlined">add_circle</span>
+        Add Payment
+      </button>
+
+    </section>
+
+    <!-- RIGHT: Paid entries + summary + complete -->
+    <section class="w-[45%] flex flex-col p-6 gap-5 overflow-y-auto">
+
+      <!-- Paid entries table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1">
+        <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <span class="text-sm font-bold text-slate-600 uppercase tracking-wider">Daftar Pembayaran</span>
+          <span class="text-xs text-slate-400">{{ paidEntries().length }} entri</span>
+        </div>
+
+        @if (paidEntries().length === 0) {
+          <div class="flex flex-col items-center justify-center py-14 text-slate-400 gap-3">
+            <span class="material-symbols-outlined text-5xl">receipt_long</span>
+            <p class="text-sm font-medium">Belum ada pembayaran ditambahkan</p>
+          </div>
+        } @else {
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-xs text-slate-500 uppercase tracking-wider border-b border-slate-100">
+                <th class="text-left px-4 py-2">Metode</th>
+                <th class="text-right px-4 py-2">Jumlah</th>
+                <th class="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of paidEntries(); track entry.id) {
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-base text-primary">{{ paymentTypeIcon(entry.paymentTypeId) }}</span>
+                      <span class="font-semibold text-slate-700">{{ entry.paymentLabel || entry.paymentTypeId }}</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3 text-right font-mono font-bold text-slate-900">{{ entry.paid | currencyIdr }}</td>
+                  <td class="px-3 py-3 text-center">
+                    <button
+                      class="text-red-400 hover:text-red-600 transition-colors"
+                      (click)="removePayment(entry)">
+                      <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <!-- Payment summary -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col gap-3">
+        <div class="flex justify-between text-sm text-slate-600">
+          <span>Total Tagihan</span>
+          <span class="font-mono font-semibold">{{ cartService.grandTotal() | currencyIdr }}</span>
+        </div>
+        <div class="flex justify-between text-sm text-slate-600">
+          <span>Total Dibayar</span>
+          <span class="font-mono font-semibold text-emerald-600">{{ totalPaid() | currencyIdr }}</span>
+        </div>
+
+        @if (!isPaid()) {
+          <div class="flex justify-between text-sm font-bold text-red-600 border-t border-slate-100 pt-3">
+            <span>Sisa Kekurangan</span>
+            <span class="font-mono">{{ remaining() | currencyIdr }}</span>
+          </div>
+        } @else {
+          <div class="flex justify-between text-sm font-bold text-emerald-600 border-t border-slate-100 pt-3">
+            <span>Kembalian</span>
+            <span class="font-mono">{{ changeDue() | currencyIdr }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Complete button -->
+      <button
+        class="w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xl rounded-2xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+        [disabled]="!isPaid() || completeLoading()"
+        (click)="completePayment()">
+        @if (completeLoading()) {
+          <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          Proses...
+        } @else {
+          <span class="material-symbols-outlined text-3xl">check_circle</span>
+          Selesaikan Pembayaran
+        }
+      </button>
+
+    </section>
   </div>
 </main>
+

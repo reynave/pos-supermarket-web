@@ -37,6 +37,14 @@
 - **Source**: `stitch_pos_retail_supermaket/pos_login_screen/code.html`
 - **Route**: `/login`
 
+### 2.0 Startup Setup (Before Login)
+- [x] `startup.component.ts` — form konfigurasi startup + save local JSON + test connection
+- [x] `startup.component.html` — UI setup API URL, port, printer name/type, LAN IP, serial COM
+- [x] `startup.component.css` — host styling
+- [x] `startup-config.service.ts` — load/save config ke `localStorage` (`pos_startup_config`) + test `GET {apiUrl}:{port}/api/health`
+- **Source**: `stitch_pos_retail_supermaket/startup/code.html`
+- **Route**: `/startup` (default entry sebelum login)
+
 ### 2.2 Main Menu
 - [x] `main-menu.component.ts`
 - [x] `main-menu.component.html`
@@ -62,14 +70,18 @@
 - **Note**: Renamed dari `sales-register` → `cart`. Folder `sales-register/` dihapus.
 
 ### 2.5 Payment (Checkout)
-- [x] `payment.component.ts` — pilih method (cash/card/QRIS), cash keypad, complete payment
-- [x] `payment.component.html` — full page (bukan overlay lagi)
+- [x] `payment.component.ts` — multi-payment (split payment), tipe dari API, keypad, add/remove entry, complete
+- [x] `payment.component.html` — 2-panel layout: kiri keypad + payment types, kanan paid entries table + summary
 - [x] `payment.component.css` — host styling
 - **Source**: `stitch_pos_retail_supermaket/checkout_payment_selection/code.html`
-- **Alt Source**: `stitch_pos_retail_supermaket/checkout_modals_card_qr_select_1/code.html`
-- **Alt Source**: `stitch_pos_retail_supermaket/qr_payment_interface/code.html`
 - **Route**: `/payment`
-- **Flow**: dari Cart → PAY button → `/payment`
+- **Flow**: Cart → PAY button → `/payment` → `POST /api/payment/complete` → `/receipt`
+- **Multi-Payment API**:
+  - `GET /api/payment/types` — list tipe pembayaran (filtered `isLock=1`)
+  - `GET /api/payment/pending/:kioskUuid` — current paid entries dari `kiosk_paid_pos`
+  - `POST /api/payment/add` — add entry ke `kiosk_paid_pos`
+  - `DELETE /api/payment/:id` — hapus entry dari `kiosk_paid_pos`
+  - `POST /api/payment/complete` — finalize ke `transaction`/`transaction_detail`/`transaction_payment`
 
 ### 2.6 Receipt (Struk)
 - [x] `receipt.component.ts` — preview struk, print, new transaction
@@ -77,7 +89,9 @@
 - [x] `receipt.component.css` — host styling + receipt paper zigzag
 - **Source**: `stitch_pos_retail_supermaket/transaction_details_receipt_preview/code.html`
 - **Route**: `/receipt`
-- **Flow**: dari Payment → complete → `/receipt` → New Transaction → `/cart`
+- **Flow**: dari Payment → complete → `/receipt?id={transactionId}` → New Transaction → `/cart`
+- **Reuse Flow**: dari Report klik Detail → `/receipt?id={transactionId}` (reprint)
+- **Data Source**: jika ada query param `id`, Receipt fetch `GET /api/transactions/:id`; fallback ke `CartService.lastTransaction` untuk flow lama
 
 ### 2.7 Daily Close Dashboard
 - [x] `daily-close.component.ts`
@@ -93,6 +107,14 @@
 - **Source**: `stitch_pos_retail_supermaket/pos_daily_transaction_report/code.html`
 - **Route**: `/report`
 
+### 2.10 Cash Balance Detail
+- [x] `cash-balance.component.ts`
+- [x] `cash-balance.component.html`
+- [x] `cash-balance.component.css`
+- **Source**: `stitch_pos_retail_supermaket/cash_balance/code.html`
+- **Route**: `/cash-balance`
+- **Note**: Menampilkan mutasi cash drawer (cash in/out) dari transaksi cash + opening balance shift aktif.
+
 ### 2.9 Customer Facing Display
 - [x] `customer-display.component.ts`
 - [x] `customer-display.component.html`
@@ -105,9 +127,11 @@
 - [x] Login API → tested working
 - [x] Daily Start API → POST /api/shift/open, real endpoint
 - [x] Cart/Scan API → scan/add, list, void with PIN verification (user_pin table, MD5)
+- [x] Cart Add Qty API → POST /api/item/add-qty (duplicate selected item row insert by qty)
 - [x] Payment API → POST /api/transactions (transaction + detail + payment + balance)
 - [x] Daily Close API → GET /api/shift/summary, POST /api/shift/close
 - [x] Report API → GET /api/transactions?date=&page=&limit= (paginated, with payment type)
+- [x] Report Reprint Link → tombol Detail membuka `/receipt?id={transactionId}`
 - [x] Socket.IO customer display → server relays display:update to terminal room
 
 ## Phase 4: Final
@@ -118,8 +142,8 @@
 
 ## Last Updated
 - **Date**: 2026-04-01
-- **Last Completed Step**: Phase 4 partial — Production build verified clean; protected POS transaction routes restored with `authGuard + shiftGuard`.
-- **Next Step**: End-to-end test all screens and full cashier flow against backend.
+- **Last Completed Step**: Added startup setup page before login to save API/printer settings in localStorage and test connection to `/api/health`.
+- **Next Step**: End-to-end test all screens, including startup-to-login flow and connection validation.
 
 ### Route Summary
 | Route | Component | Guard |
@@ -132,4 +156,6 @@
 | `/receipt` | ReceiptComponent | authGuard + shiftGuard |
 | `/daily-close` | DailyCloseComponent | authGuard |
 | `/report` | DailyReportComponent | authGuard |
+| `/cash-balance` | CashBalanceComponent | authGuard |
 | `/display` | CustomerDisplayComponent | — |
+| `/startup` | StartupComponent | — |

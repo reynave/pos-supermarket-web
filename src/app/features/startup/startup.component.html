@@ -1,0 +1,115 @@
+<main class="min-h-screen bg-slate-100 flex items-center justify-center p-6">
+    <div class="w-full max-w-4xl bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-8 py-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">Startup Configuration</h1>
+                <p class="text-sm text-slate-500">Simpan konfigurasi API dan printer sebelum login</p>
+            </div>
+            <span class="material-symbols-outlined text-3xl text-primary">settings_ethernet</span>
+        </div>
+
+        <div class="p-8 space-y-8">
+
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Server Connection</h2>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-semibold mb-1">Terminal ID</label>
+                        <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                            [ngModel]="config().terminalId" (ngModelChange)="updateField('terminalId', $event)"
+                            placeholder="T01" />
+                    </div>
+                </div>
+
+            </section>
+
+
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Server Connection</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-7">
+                        <label class="block text-sm font-semibold mb-1">API Server URL</label>
+                        <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                            [ngModel]="config().apiUrl" (ngModelChange)="updateField('apiUrl', $event)"
+                            placeholder="http://192.168.1.100" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Port</label>
+                        <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                            [ngModel]="config().apiPort" (ngModelChange)="updateField('apiPort', $event)"
+                            placeholder="3000" />
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                         <button
+                        class="px-4 h-11 w-full rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 disabled:opacity-60"
+                        (click)="onTestConnection()" [disabled]="testing()">
+                        {{ testing() ? 'Testing...' : 'Test Connection' }}
+                    </button>
+                    </div>
+                    
+                </div>
+
+                <div class="flex flex-wrap gap-3 items-center">
+                  
+                    @if (testResult()) {
+                    <div class="px-4 py-2 w-full rounded-lg text-sm font-semibold"
+                        [ngClass]="testResult()!.ok ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'">
+                        {{ testResult()!.message }} ({{ testResult()!.url }})
+                    </div>
+                    }
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Printer Setting</h2>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Printer Name</label>
+                    <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                        [ngModel]="config().printerName" (ngModelChange)="updateField('printerName', $event)"
+                        placeholder="EPSON TM-T88VI" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Printer Type</label>
+                    <div class="flex gap-2 flex-wrap">
+                        @for (type of printerTypes; track type) {
+                        <button type="button" class="px-4 h-10 rounded-xl border font-bold text-sm"
+                            [ngClass]="config().printerType === type ? 'bg-orange-50 text-primary border-primary' : 'bg-white text-slate-600 border-slate-300'"
+                            (click)="updateField('printerType', type)">
+                            {{ type }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                @if (isLan()) {
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Printer IP (LAN)</label>
+                    <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                        [ngModel]="config().printerIp" (ngModelChange)="updateField('printerIp', $event)"
+                        placeholder="192.168.1.200" />
+                </div>
+                }
+
+                @if (isSerialOrCom()) {
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Serial/COM Port</label>
+                    <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
+                        [ngModel]="config().serialComPort" (ngModelChange)="updateField('serialComPort', $event)"
+                        placeholder="COM3" />
+                </div>
+                }
+            </section>
+        </div>
+
+        <div class="px-8 py-5 border-t border-slate-200 bg-white flex justify-end gap-3">
+            <button
+                class="p-5 w-full rounded-xl bg-primary hover:bg-primary-dark text-white font-bold disabled:opacity-60"
+                (click)="onSaveAndConnect()" [disabled]="saving()">
+                {{ saving() ? 'Saving...' : 'Save & Continue to Login' }}
+            </button>
+        </div>
+    </div>
+</main>

@@ -33,6 +33,13 @@ interface BackendCartInsertResult extends BackendItem {
   kioskUuid: string;
 }
 
+interface AddQtyResult {
+  kioskUuid: string;
+  itemId: string;
+  qty: number;
+  insertedCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ItemService {
   private readonly API = environment.apiUrl;
@@ -69,6 +76,18 @@ export class ItemService {
       .post<ApiResponse<BackendCartInsertResult>>(`${this.API}/item/add`, { kioskUuid, itemId })
       .pipe(
         map((res) => (res.success && res.data ? this.mapToItem(res.data) : null)),
+        catchError(() => of(null)),
+      );
+  }
+
+  /**
+   * POST /api/item/add-qty — duplicate selected item rows to kiosk_cart based on qty.
+   */
+  addQtyBySelected(kioskUuid: string, itemId: string, qty: number, barcode?: string): Observable<AddQtyResult | null> {
+    return this.http
+      .post<ApiResponse<AddQtyResult>>(`${this.API}/item/add-qty`, { kioskUuid, itemId, qty, barcode })
+      .pipe(
+        map((res) => (res.success && res.data ? res.data : null)),
         catchError(() => of(null)),
       );
   }
