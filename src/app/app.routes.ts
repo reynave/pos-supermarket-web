@@ -20,10 +20,22 @@ export const routes: Routes = [
       import('./features/menu/main-menu/main-menu.component').then((m) => m.MainMenuComponent),
   },
   {
+    path: 'report-submenu',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/menu/report-submenu/report-submenu.component').then((m) => m.ReportSubmenuComponent),
+  },
+  {
     path: 'daily-start',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/daily-ops/daily-start/daily-start.component').then((m) => m.DailyStartComponent),
+  },
+  {
+    path: 'manual-cash-in',
+    canActivate: [authGuard, shiftGuard],
+    loadComponent: () =>
+      import('./features/daily-ops/manual-cash-in/manual-cash-in.component').then((m) => m.ManualCashInComponent),
   },
   {
     path: 'daily-close',
@@ -54,6 +66,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/report/daily-report/daily-report.component').then((m) => m.DailyReportComponent),
+  },
+  {
+    path: 'daily-close-history',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/report/daily-close-history/daily-close-history.component').then((m) => m.DailyCloseHistoryComponent),
   },
   {
     path: 'cash-balance',

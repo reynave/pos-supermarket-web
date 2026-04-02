@@ -19,7 +19,6 @@ import {
 export class StartupComponent {
   config = signal<StartupConfig>(this.startupConfigService.loadConfig());
   testing = signal(false);
-  saving = signal(false);
   testResult = signal<ConnectionTestResult | null>(null);
 
   printerTypes: PrinterType[] = ['LAN', 'SERIAL', 'COM'];
@@ -46,9 +45,6 @@ export class StartupComponent {
   }
 
   onSaveAndConnect(): void {
-    this.saving.set(true);
-    this.startupConfigService.saveConfig(this.config());
-    this.saving.set(false);
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

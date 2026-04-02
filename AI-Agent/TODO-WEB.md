@@ -38,10 +38,12 @@
 - **Route**: `/login`
 
 ### 2.0 Startup Setup (Before Login)
-- [x] `startup.component.ts` — form konfigurasi startup + save local JSON + test connection
-- [x] `startup.component.html` — UI setup API URL, port, printer name/type, LAN IP, serial COM
+- [x] `startup.component.ts` — form startup + test connection tanpa simpan localStorage
+- [x] `startup.component.html` — field dari `connection.js` (Terminal ID, API URL, Port) dibuat read-only
 - [x] `startup.component.css` — host styling
-- [x] `startup-config.service.ts` — load/save config ke `localStorage` (`pos_startup_config`) + test `GET {apiUrl}:{port}/api/health`
+- [x] `startup-config.service.ts` — load config dari runtime `public/connection.js` + test `GET {apiUrl}:{port}/api/health`
+- [x] `public/connection.js` — source of truth runtime config (api/socket/terminal/outlet/printer)
+- [x] Runtime config mapper disesuaikan ke format baru `host` (derived `apiUrl` + `socketUrl`) agar env & startup sinkron
 - **Source**: `stitch_pos_retail_supermaket/startup/code.html`
 - **Route**: `/startup` (default entry sebelum login)
 
@@ -52,12 +54,26 @@
 - **Source**: `stitch_pos_retail_supermaket/pos_main_menu/code.html`
 - **Route**: `/menu`
 
+### 2.2a Report Submenu
+- [x] `report-submenu.component.ts`
+- [x] `report-submenu.component.html`
+- [x] `report-submenu.component.css`
+- **Route**: `/report-submenu`
+
 ### 2.3 Daily Start Dashboard
 - [x] `daily-start.component.ts`
 - [x] `daily-start.component.html`
 - [x] `daily-start.component.css`
 - **Source**: `stitch_pos_retail_supermaket/pos_daily_start_dashboard/code.html`
 - **Route**: `/daily-start`
+
+### 2.3a Manual Cash In
+- [x] `manual-cash-in.component.ts`
+- [x] `manual-cash-in.component.html`
+- [x] `manual-cash-in.component.css`
+- [x] `manual-cash.service.ts` (GET summary, POST add cash in, POST open drawer)
+- **Design**: mirip Daily Start, tanpa badge/button "New Session"
+- **Route**: `/manual-cash-in`
 
 ### 2.4 Cart (Scan & Keranjang)
 - [x] `cart.component.ts` — scan item, keypad, void, cart state via CartService
@@ -107,6 +123,12 @@
 - **Source**: `stitch_pos_retail_supermaket/pos_daily_transaction_report/code.html`
 - **Route**: `/report`
 
+### 2.8a Daily Close History
+- [x] `daily-close-history.component.ts`
+- [x] `daily-close-history.component.html`
+- [x] `daily-close-history.component.css`
+- **Route**: `/daily-close-history`
+
 ### 2.10 Cash Balance Detail
 - [x] `cash-balance.component.ts`
 - [x] `cash-balance.component.html`
@@ -126,10 +148,15 @@
 ## Phase 3: Backend API Integration (per feature)
 - [x] Login API → tested working
 - [x] Daily Start API → POST /api/shift/open, real endpoint
+- [x] Manual Cash In API → `GET /api/manual-cash/summary/:terminalId?`, `POST /api/manual-cash/add`, `POST /api/manual-cash/open-drawer`
+- [x] Daily Start session persistence → save active session ID to localStorage (`shiftId`/`settlementId` + `resetId` compatibility)
 - [x] Cart/Scan API → scan/add, list, void with PIN verification (user_pin table, MD5)
 - [x] Cart Add Qty API → POST /api/item/add-qty (duplicate selected item row insert by qty)
 - [x] Payment API → POST /api/transactions (transaction + detail + payment + balance)
-- [x] Daily Close API → GET /api/shift/summary, POST /api/shift/close
+- [x] Payment complete payload updated → sends `resetId` (with fallback `settlementId`) for backend compatibility
+- [x] Daily Close API → GET /api/daily-close/:resetId, POST /api/daily-close/:resetId
+- [x] Daily Close Report API → GET /api/daily-close/report/:resetId
+- [x] Main menu route wired → tombol Daily Close Report now navigates to `/daily-close`
 - [x] Report API → GET /api/transactions?date=&page=&limit= (paginated, with payment type)
 - [x] Report Reprint Link → tombol Detail membuka `/receipt?id={transactionId}`
 - [x] Socket.IO customer display → server relays display:update to terminal room
@@ -138,24 +165,43 @@
 - [x] Full build clean (`ng build --configuration=production`)
 - [ ] End-to-end test all screens
 
+## Phase 5: Wajib Ditambah (Masukan AI)
+
+### 5.1 Stabilitas Operasional POS
+- [ ] E2E automation untuk happy-path utama: startup -> login -> daily-start -> cart -> payment -> receipt -> daily-close.
+- [ ] Global error boundary UX: fallback page + retry action untuk API timeout/network error.
+- [ ] Offline-safe UX minimum: indikator koneksi, disable aksi kritikal saat offline, dan pesan recovery.
+
+### 5.2 Integrasi Device Nyata
+- [ ] Print & cash-drawer flow real-device readiness (status printer, retry, error toast yang actionable).
+- [ ] Supervisor override dialog terstandar untuk void/aksi sensitif (PIN flow konsisten lintas halaman).
+
+### 5.3 Kualitas Produk
+- [ ] Route-level loading skeleton + empty/error states di semua screen data-heavy (`/report`, `/cash-balance`, `/daily-close-history`).
+- [ ] Accessibility pass untuk touch POS (focus order, keyboard scanner flow, kontras teks, target sentuh >=48px).
+- [ ] Smoke test CI untuk build + lint + test minimal agar regresi cepat ketahuan.
+
 ---
 
 ## Last Updated
-- **Date**: 2026-04-01
-- **Last Completed Step**: Added startup setup page before login to save API/printer settings in localStorage and test connection to `/api/health`.
-- **Next Step**: End-to-end test all screens, including startup-to-login flow and connection validation.
+- **Date**: 2026-04-02
+- **Last Completed Step**: Dedicated Daily Close endpoints aktif, startup runtime config (`public/connection.js`) sinkron, dan route tambahan report history/submenu sudah wired.
+- **Next Step**: Jalankan E2E test full closing flow + hardening UX untuk error/offline/device.
 
 ### Route Summary
 | Route | Component | Guard |
 |-------|-----------|-------|
 | `/login` | LoginComponent | — |
 | `/menu` | MainMenuComponent | authGuard |
+| `/report-submenu` | ReportSubmenuComponent | authGuard |
 | `/daily-start` | DailyStartComponent | authGuard |
+| `/manual-cash-in` | ManualCashInComponent | authGuard + shiftGuard |
 | `/cart` | CartComponent | authGuard + shiftGuard |
 | `/payment` | PaymentComponent | authGuard + shiftGuard |
 | `/receipt` | ReceiptComponent | authGuard + shiftGuard |
 | `/daily-close` | DailyCloseComponent | authGuard |
 | `/report` | DailyReportComponent | authGuard |
+| `/daily-close-history` | DailyCloseHistoryComponent | authGuard |
 | `/cash-balance` | CashBalanceComponent | authGuard |
 | `/display` | CustomerDisplayComponent | — |
 | `/startup` | StartupComponent | — |

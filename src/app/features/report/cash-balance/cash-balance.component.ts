@@ -4,21 +4,24 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
-import { Transaction } from '../../../core/models/transaction.model';
 import { SessionService } from '../../../core/services/session.service';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
-interface ShiftSummaryResponse {
+interface CashBalanceHistoryResponse {
   openingBalance: number;
-  payments: Array<{ paymentTypeId: string; count: number; totalAmount: number }>;
+  items: CashBalanceRow[];
+  total: number;
+  resetOptions: string[];
 }
 
 interface CashBalanceRow {
+  resetId: string;
   dateTime: string;
   billNo: string;
   cashIn: number;
   cashOut: number;
   cashierName: string;
+  rowType: 'OPENING' | 'MANUAL_CASH_IN' | 'TRANSACTION';
 }
 
 @Component({
@@ -30,9 +33,7 @@ interface CashBalanceRow {
 })
 export class CashBalanceComponent implements OnInit {
   loading = signal(false);
-  selectedDate = signal(new Date());
-  currentPage = signal(1);
-  pageSize = 20;
+  selectedResetId = signal('');
 
   openingBalance = signal(0);
   cashRows = signal<CashBalanceRow[]>([]);
@@ -40,18 +41,20 @@ export class CashBalanceComponent implements OnInit {
   errorMessage = signal('');
 
   totalCashIn = computed(() =>
-    this.cashRows().reduce((sum, row) => sum + row.cashIn, 0),
+    this.cashRows()
+      .filter((row) => row.rowType !== 'OPENING')
+      .reduce((sum, row) => sum + Number(row.cashIn || 0), 0),
   );
 
   totalCashOut = computed(() =>
-    this.cashRows().reduce((sum, row) => sum + row.cashOut, 0),
+    this.cashRows()
+      .filter((row) => row.rowType !== 'OPENING')
+      .reduce((sum, row) => sum + Number(row.cashOut || 0), 0),
   );
 
   currentCashBalance = computed(() =>
     this.openingBalance() + this.totalCashIn() - this.totalCashOut(),
   );
-
-  activeSettlementId = computed(() => this.sessionService.session()?.settlementId || '');
 
   constructor(
     private http: HttpClient,
@@ -60,43 +63,13 @@ export class CashBalanceComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const activeResetId = this.sessionService.session()?.resetId || this.sessionService.session()?.shiftId || '';
+    this.selectedResetId.set(activeResetId);
     this.loadData();
   }
 
-  get formattedDate(): string {
-    return this.selectedDate().toLocaleDateString('id-ID', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  }
-
-  prevDate(): void {
-    const next = new Date(this.selectedDate());
-    next.setDate(next.getDate() - 1);
-    this.selectedDate.set(next);
-    this.currentPage.set(1);
-    this.loadData();
-  }
-
-  nextDate(): void {
-    const next = new Date(this.selectedDate());
-    next.setDate(next.getDate() + 1);
-    this.selectedDate.set(next);
-    this.currentPage.set(1);
-    this.loadData();
-  }
-
-  prevPage(): void {
-    if (this.currentPage() <= 1) return;
-    this.currentPage.update((page) => page - 1);
-    this.loadTransactions();
-  }
-
-  nextPage(): void {
-    this.currentPage.update((page) => page + 1);
-    this.loadTransactions();
+  goBack(): void {
+    history.back();
   }
 
   goToMenu(): void {
@@ -107,35 +80,13 @@ export class CashBalanceComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    const settlementId = this.activeSettlementId();
-    if (!settlementId) {
-      this.openingBalance.set(0);
-      this.loadTransactions();
-      return;
-    }
-
-    this.http.get<ApiResponse<ShiftSummaryResponse>>(
-      `${environment.apiUrl}/shift/summary/${settlementId}`,
-    ).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.openingBalance.set(Number(res.data.openingBalance || 0));
-        }
-        this.loadTransactions();
+    this.http.get<ApiResponse<CashBalanceHistoryResponse>>(
+      `${environment.apiUrl}/manual-cash/history`,
+      {
+        params: {
+          ...(this.selectedResetId() ? { resetId: this.selectedResetId() } : {}),
+        },
       },
-      error: () => {
-        this.openingBalance.set(0);
-        this.loadTransactions();
-      },
-    });
-  }
-
-  private loadTransactions(): void {
-    const dateStr = this.selectedDate().toISOString().split('T')[0];
-
-    this.http.get<ApiResponse<{ items: Transaction[]; total: number }>>(
-      `${environment.apiUrl}/transactions`,
-      { params: { date: dateStr, page: this.currentPage(), limit: this.pageSize } },
     ).subscribe({
       next: (res) => {
         this.loading.set(false);
@@ -145,11 +96,8 @@ export class CashBalanceComponent implements OnInit {
           return;
         }
 
-        const rows = (res.data.items || [])
-          .filter((trx) => trx.status === 1)
-          .map((trx) => this.toCashBalanceRow(trx));
-
-        this.cashRows.set(rows);
+        this.openingBalance.set(Number(res.data.openingBalance || 0));
+        this.cashRows.set(res.data.items || []);
         this.totalItems.set(res.data.total || 0);
       },
       error: (err) => {
@@ -159,17 +107,5 @@ export class CashBalanceComponent implements OnInit {
         this.errorMessage.set(err?.error?.message || 'Gagal memuat data cash balance');
       },
     });
-  }
-
-  private toCashBalanceRow(trx: Transaction): CashBalanceRow {
-    const amount = Number(trx.grandTotal || 0);
-
-    return {
-      dateTime: trx.inputDate,
-      billNo: trx.id,
-      cashIn: amount >= 0 ? amount : 0,
-      cashOut: amount < 0 ? Math.abs(amount) : 0,
-      cashierName: trx.cashierName || trx.cashierId || '-',
-    };
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 
 export interface SessionState {
   shiftId: string;
+  resetId?: string;
   settlementId: string;
   openingBalance: number;
   isShiftActive: boolean;

@@ -65,16 +65,18 @@ export class DailyStartComponent {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.post<ApiResponse<{ settlementId: string; cashierId: string; openingBalance: number; terminalId: string; alreadyOpen: boolean }>>(
+    this.http.post<ApiResponse<{ resetId?: string; settlementId?: string; cashierId: string; openingBalance: number; terminalId: string; alreadyOpen: boolean }>>(
       `${environment.apiUrl}/shift/open`,
       { openingBalance, terminalId: environment.terminalId },
     ).subscribe({
       next: (res) => {
         this.loading.set(false);
         if (res.success && res.data) {
+          const sessionId = res.data.resetId || res.data.settlementId || '';
           this.sessionService.startShift({
-            shiftId: res.data.settlementId,
-            settlementId: res.data.settlementId,
+            shiftId: sessionId,
+            resetId: sessionId,
+            settlementId: sessionId,
             openingBalance,
           });
           this.router.navigate(['/cart']);

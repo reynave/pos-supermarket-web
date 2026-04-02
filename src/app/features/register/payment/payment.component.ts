@@ -262,10 +262,12 @@ export class PaymentComponent implements OnInit {
     if (!kioskUuid || !session) return;
 
     const cashEntry = this.paidEntries().find((e) => e.paymentTypeId === 'CASH');
+    const sessionId = session.resetId || session.settlementId || session.shiftId || '';
     const body: Record<string, unknown> = {
       kioskUuid,
       terminalId: environment.terminalId,
-      settlementId: session.settlementId || session.shiftId || '',
+      resetId: sessionId,
+      settlementId: sessionId,
     };
     if (cashEntry) body['cashReceived'] = this.totalPaid();
 

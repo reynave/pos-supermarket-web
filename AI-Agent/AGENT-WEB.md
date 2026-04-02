@@ -3,6 +3,15 @@
 > This document describes the frontend Angular SPA for the POS Supermarket system.
 > For backend context (API, database, business logic), see `../pos-supermarket/AGENT.md`.
 
+## Fast Start (Latest Verified: 2026-04-02)
+
+Untuk kolaborasi AI agent yang cepat, cek 4 poin ini dulu:
+
+- Default app entry sekarang `'/startup'` (bukan `'/login'`).
+- Cart runtime route memakai `'/cart'`, bukan `'/register'`.
+- Daily session memakai `resetId` (frontend masih kompatibel dengan fallback `settlementId`).
+- Runtime connection source of truth ada di `public/connection.js` dan dibaca lewat `StartupConfigService`.
+
 ---
 
 ## 1. Project Overview
@@ -68,17 +77,22 @@ Cart ··· (Socket.IO) ··· Customer Facing Display (parallel screen)
 ### Route-to-Screen Mapping
 | Route | Component | Guard | Screen |
 |-------|-----------|-------|--------|
+| `/startup` | `StartupComponent` | none | Startup setup & test koneksi |
 | `/login` | `LoginComponent` | none | POS Login Screen |
 | `/menu` | `MainMenuComponent` | `authGuard` | POS Main Menu |
+| `/report-submenu` | `ReportSubmenuComponent` | `authGuard` | Report submenu |
 | `/daily-start` | `DailyStartComponent` | `authGuard` | Daily Start Dashboard |
+| `/manual-cash-in` | `ManualCashInComponent` | `authGuard`, `shiftGuard` | Manual Cash In |
 | `/cart` | `CartComponent` | `authGuard`, `shiftGuard` | Scan Item & Keranjang |
 | `/payment` | `PaymentComponent` | `authGuard`, `shiftGuard` | Checkout Payment |
 | `/receipt` | `ReceiptComponent` | `authGuard`, `shiftGuard` | Struk / Receipt Preview |
 | `/daily-close` | `DailyCloseComponent` | `authGuard` | Daily Close Dashboard |
 | `/report` | `DailyReportComponent` | `authGuard` | Daily Transaction Report |
+| `/daily-close-history` | `DailyCloseHistoryComponent` | `authGuard` | Riwayat daily close |
+| `/cash-balance` | `CashBalanceComponent` | `authGuard` | Cash balance detail |
 | `/display` | `CustomerDisplayComponent` | none | Customer Facing Display |
-| `/` | redirect → `/login` | — | — |
-| `**` | redirect → `/login` | — | — |
+| `/` | redirect → `/startup` | — | — |
+| `**` | redirect → `/startup` | — | — |
 
 ### Guards
 - **`authGuard`** — checks `AuthService.isLoggedIn()` (signal-based), redirects to `/login` if no token
@@ -109,7 +123,7 @@ pos-supermarket-web/
 │   └── app/
 │       ├── app.component.ts      # Root: <router-outlet />
 │       ├── app.config.ts         # provideRouter, provideHttpClient + authInterceptor
-│       ├── app.routes.ts         # 9 lazy-loaded routes
+│       ├── app.routes.ts         # route map lengkap (startup, auth, daily ops, register, report, display)
 │       ├── core/
 │       │   ├── services/
 │       │   │   ├── auth.service.ts      # login/logout/clearSession, JWT in localStorage, signals
@@ -139,18 +153,24 @@ pos-supermarket-web/
 │           │       ├── login.component.html
 │           │       └── login.component.css
 │           ├── menu/
-│           │   └── main-menu/main-menu.component.ts
+│           │   ├── main-menu/main-menu.component.ts
+│           │   └── report-submenu/report-submenu.component.ts
 │           ├── daily-ops/
 │           │   ├── daily-start/daily-start.component.ts
+│           │   ├── manual-cash-in/manual-cash-in.component.ts
 │           │   └── daily-close/daily-close.component.ts
 │           ├── register/
 │           │   ├── cart/cart.component.ts          # Scan item, keranjang, keypad
 │           │   ├── payment/payment.component.ts    # Cash/Card/QRIS checkout
 │           │   └── receipt/receipt.component.ts     # Struk preview, print, new txn
 │           ├── report/
-│           │   └── daily-report/daily-report.component.ts
-│           └── display/
-│               └── customer-display/customer-display.component.ts
+│           │   ├── daily-report/daily-report.component.ts
+│           │   ├── daily-close-history/daily-close-history.component.ts
+│           │   └── cash-balance/cash-balance.component.ts
+│           ├── display/
+│           │   └── customer-display/customer-display.component.ts
+│           └── startup/
+│               └── startup.component.ts
 └── stitch_pos_retail_supermaket/    # Reference HTML mockups (Google Stitch)
     ├── pos_login_screen/
     ├── pos_main_menu/
@@ -236,14 +256,14 @@ Full reference: `DESIGN.md`
 | POST | `/api/auth/logout` | `{}` (Bearer token) | `{ success, message }` |
 | GET | `/api/auth/me` | (Bearer token) | `{ user }` |
 
-### Remaining Endpoints (to implement)
-See `../pos-supermarket/AGENT.md` section 6 for full API reference:
-- Item: `/api/item/barcode/:barcode`, `/api/item/:id`
-- Cart: `/api/cart/start`, `/api/cart/scan`, `/api/cart/:kioskUuid`
-- Payment: `/api/payment/types`, `/api/payment/add`, `/api/payment/finalize`
-- Daily: `/api/daily/open`, `/api/daily/close`, `/api/daily/balance`
-- Report: `/api/report/daily`, `/api/report/z-report/:id`
-- Member: `/api/member/:id`
+### Current Backend Endpoints Used by Frontend
+Gunakan naming endpoint real yang sudah aktif di backend sekarang:
+- Item/cart add: `/api/item/barcode`, `/api/item/add`, `/api/item/add-qty`
+- Cart session: `/api/cart/new`, `/api/cart/list/:kioskUuid`, `/api/cart/void/:kioskUuid`, `/api/cart/voidItem/:kioskUuid`
+- Payment split: `/api/payment/types`, `/api/payment/pending/:kioskUuid`, `/api/payment/add`, `/api/payment/:id`, `/api/payment/complete`
+- Transaction/report: `/api/transactions`, `/api/transactions/:id`
+- Daily close: `/api/daily-close/:resetId`, `/api/daily-close/report/:resetId`, `/api/daily-close/history`
+- Manual cash: `/api/manual-cash/summary/:terminalId?`, `/api/manual-cash/add`, `/api/manual-cash/open-drawer`
 
 ### Error Response Format
 ```json

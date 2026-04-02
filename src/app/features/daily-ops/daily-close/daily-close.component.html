@@ -1,50 +1,27 @@
 <div class="min-h-screen bg-background-light flex flex-col">
   <!-- Top Navigation Bar -->
-  <header class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3 sticky top-0 z-50">
-    <div class="flex items-center gap-4">
-      <div class="bg-primary p-2 rounded-lg text-white">
-        <span class="material-symbols-outlined block">point_of_sale</span>
-      </div>
-      <div>
-        <h2 class="text-slate-900 text-lg font-bold leading-tight">Supermarket POS</h2>
-        <p class="text-slate-500 text-xs">Terminal {{ 'T-042' }}</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="hidden md:flex flex-col items-end mr-4">
-        <span class="text-sm font-bold text-slate-900">{{ userName }}</span>
-        <span class="text-xs text-slate-500">{{ userRole }}</span>
-      </div>
-      <button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" routerLink="/menu">
-        <span class="material-symbols-outlined">home</span>
+  <header class="grid grid-cols-3 items-center border-b border-slate-200 bg-white px-4 md:px-6 py-3 sticky top-0 z-50 gap-3">
+    <div class="justify-self-start">
+      <button
+        class="inline-flex items-center gap-2 rounded-xl h-10 px-3 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+        routerLink="/menu">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        <span class="text-sm font-semibold">Back</span>
       </button>
+    </div>
+
+    <div class="justify-self-center text-center">
+      <h1 class="text-xl md:text-2xl font-black tracking-tight text-slate-900">Daily Close</h1>
+    </div>
+
+    <div class="justify-self-end text-right leading-tight">
+      <p class="text-xs text-slate-500">Cashier</p>
+      <p class="text-sm font-bold text-slate-900">{{ cashierId || '-' }} / {{ userName || '-' }}</p>
     </div>
   </header>
 
-  <main class="p-6 max-w-7xl mx-auto w-full">
-    <!-- Dashboard Header -->
-    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div>
-        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900">Daily Close Dashboard</h1>
-        <div class="flex items-center gap-2 mt-2">
-          <span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Shift Active</span>
-        </div>
-      </div>
-      <div class="flex bg-white rounded-xl p-1 shadow-sm border border-slate-200">
-        <button
-          class="px-6 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors"
-          [class.bg-primary]="activeTab() === 'eod'"
-          [class.text-white]="activeTab() === 'eod'"
-          [class.text-slate-500]="activeTab() !== 'eod'"
-          (click)="activeTab.set('eod')">End of Day</button>
-        <button
-          class="px-6 py-2 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors"
-          [class.bg-primary]="activeTab() === 'history'"
-          [class.text-white]="activeTab() === 'history'"
-          [class.text-slate-500]="activeTab() !== 'history'"
-          (click)="activeTab.set('history')">History</button>
-      </div>
-    </div>
+  <main class="p-3 pb-40 max-w-7xl mx-auto w-full">
+    
 
     @if (errorMessage()) {
       <div class="mb-6 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-5 py-3.5 rounded-2xl">
@@ -64,26 +41,28 @@
           </div>
           <div class="space-y-4">
             @for (row of denominations; track row.label) {
-              <div class="grid grid-cols-12 gap-4 items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+              <div class="grid grid-cols-12 gap-2 items-center px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
                 <div class="col-span-4 font-bold text-slate-700">{{ row.label }}</div>
                 <div class="col-span-3">
                   <input
                     type="number"
                     min="0"
                     [(ngModel)]="row.qty"
+                    (ngModelChange)="onQtyChange(row, $event)"
                     class="w-full rounded-lg border-slate-300 focus:ring-primary focus:border-primary text-center"
                     placeholder="Qty" />
                 </div>
                 <div class="col-span-5 text-right font-mono font-bold text-lg">{{ denominationTotal(row) | currencyIdr }}</div>
               </div>
             }
-            <div class="grid grid-cols-12 gap-4 items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <div class="grid grid-cols-12 gap-4 items-center px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
               <div class="col-span-4 font-bold text-slate-700">Other / Coins</div>
               <div class="col-span-8">
                 <input
                   type="number"
                   min="0"
                   [(ngModel)]="coinsOther"
+                  (ngModelChange)="onCoinsOtherChange($event)"
                   class="w-full rounded-lg border-slate-300 focus:ring-primary focus:border-primary text-right font-mono text-lg"
                   placeholder="Enter Total Value" />
               </div>
@@ -117,6 +96,20 @@
               <span class="text-slate-500">Digital Payments</span>
               <span class="font-bold text-primary">{{ summary().digitalPayments | currencyIdr }}</span>
             </div>
+            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+              <span class="text-slate-500">Opening Balance</span>
+              <span class="font-bold text-slate-700">{{ summary().openingBalance | currencyIdr }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-slate-100">
+              <span class="text-slate-500">Total Cash In (Balance)</span>
+              <span class="font-bold text-green-600">{{ summary().totalCashIn | currencyIdr }}</span>
+            </div>
+            @if (summary().totalCashOut > 0) {
+              <div class="flex justify-between items-center py-2 border-b border-slate-100">
+                <span class="text-slate-500">Total Cash Out</span>
+                <span class="font-bold text-red-500">- {{ summary().totalCashOut | currencyIdr }}</span>
+              </div>
+            }
             <div class="flex justify-between items-center py-3 bg-primary/5 px-3 rounded-lg mt-4">
               <span class="font-bold text-slate-900">System Cash Expected</span>
               <span class="text-xl font-black font-mono">{{ summary().cashExpected | currencyIdr }}</span>
@@ -160,10 +153,13 @@
       </div>
     </div>
 
-    <!-- Bottom Action -->
-    <div class="mt-8 mb-12">
+  </main>
+
+  <!-- Bottom Action -->
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto w-full p-4 md:p-6">
       <button
-        class="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-2xl shadow-xl flex items-center justify-center gap-4 transition-all transform active:scale-[0.98] disabled:opacity-60"
+        class="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-2xl shadow-xl flex items-center justify-center gap-4 transition-all transform active:scale-[0.98] disabled:opacity-60"
         [disabled]="closing()"
         (click)="closeShift()">
         @if (closing()) {
@@ -181,5 +177,5 @@
         }
       </button>
     </div>
-  </main>
+  </div>
 </div>

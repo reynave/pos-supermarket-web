@@ -205,6 +205,13 @@ export class CartComponent implements OnInit, OnDestroy {
     this.addQtyValue.set(1);
   }
 
+  selectedCartItemName(): string {
+    const idx = this.cartService.selectedIndex();
+    if (idx < 0) return '-';
+
+    return this.cartService.cart()[idx]?.name ?? '-';
+  }
+
   onVoidQtyKeypadPress(key: string): void {
     const current = String(this.voidItemQty() || 0);
     this.voidItemQty.set(this.applyModalKeypad(current, key));

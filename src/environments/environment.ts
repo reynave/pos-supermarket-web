@@ -1,7 +1,11 @@
+import { getRuntimeConnectionConfig } from '../app/core/config/runtime-connection';
+
+const runtime = getRuntimeConnectionConfig();
+
 export const environment = {
   production: false,
-  apiUrl: '/api',
-  socketUrl: 'http://localhost:3000',
-  terminalId: 'T01',
-  storeOutletId: 'OT99',
+  apiUrl: runtime.apiUrl,
+  socketUrl: runtime.socketUrl,
+  terminalId: runtime.terminalId,
+  storeOutletId: runtime.storeOutletId,
 };

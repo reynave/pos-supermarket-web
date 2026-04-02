@@ -3,3 +3,47 @@
   width: 100%;
   min-height: 100vh;
 }
+
+.keypad-panel {
+  align-self: stretch;
+}
+
+.keypad-btn {
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 1.125rem;
+  font-weight: 700;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.keypad-btn:hover {
+  background: #f8fafc;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.keypad-btn:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.keypad-btn-muted {
+  background: #e2e8f0;
+}
+
+.keypad-btn-secondary {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.keypad-btn-primary {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.keypad-btn-primary:hover {
+  background: #1d4ed8;
+}

@@ -2,7 +2,7 @@
   <header class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
    
     <div class="flex items-center gap-3">
-      <button [routerLink]="['/']" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
+      <button (click)="goBack()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
         <span class="material-symbols-outlined">arrow_back</span>  
       </button>
       <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
@@ -14,16 +14,17 @@
       </div>
     </div>
 
-    <div class="flex">
-       <div class="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-        <button class="p-2 hover:bg-slate-100 rounded-lg text-slate-600" (click)="prevDate()">
-          <span class="material-symbols-outlined">chevron_left</span>
-        </button>
-        <div class="px-4 text-slate-900 font-bold min-w-[220px] text-center">{{ formattedDate }}</div>
-        <button class="p-2 hover:bg-slate-100 rounded-lg text-slate-600" (click)="nextDate()">
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 h-11 shadow-sm">
+        <span class="text-sm font-semibold text-slate-600">Reset ID</span>
+        <span class="text-sm font-bold text-slate-900">{{ selectedResetId() || '-' }}</span>
       </div>
+      <a
+        [routerLink]="['/manual-cash-in']"
+        class="inline-flex items-center gap-2 rounded-xl h-11 px-4 bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm font-semibold">
+        <span class="material-symbols-outlined text-[20px]">add_card</span>
+        <span>Manual Cash In</span>
+      </a>
     </div>
 
   
@@ -78,6 +79,7 @@
           <table class="w-full text-left">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Reset ID</th>
                 <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Date &amp; Time</th>
                 <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Bill No.</th>
                 <th class="px-5 py-4 text-xs uppercase tracking-wider text-slate-500">Cash In</th>
@@ -88,12 +90,16 @@
             <tbody class="divide-y divide-slate-100">
               @for (row of cashRows(); track row.billNo + '-' + row.dateTime) {
                 <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="px-5 py-4 font-mono text-slate-700">{{ row.resetId }}</td>
                   <td class="px-5 py-4 font-medium">{{ row.dateTime | date:'medium' }}</td>
                   <td class="px-5 py-4 font-mono text-primary font-bold">
-                
-                    <a [routerLink]="['/receipt']" [queryParams]="{ id: row.billNo }" routerLinkActive="router-link-active">
-                      {{ row.billNo }}
-                    </a>
+                    @if (row.rowType === 'TRANSACTION') {
+                      <a [routerLink]="['/receipt']" [queryParams]="{ id: row.billNo }" routerLinkActive="router-link-active">
+                        {{ row.billNo }}
+                      </a>
+                    } @else {
+                      <span class="text-slate-700">{{ row.billNo }}</span>
+                    }
                   </td>
                   <td class="px-5 py-4">
                     @if (row.cashIn > 0) {
@@ -115,7 +121,7 @@
 
               @if (cashRows().length === 0) {
                 <tr>
-                  <td colspan="5" class="px-5 py-14 text-center text-slate-400">
+                  <td colspan="6" class="px-5 py-14 text-center text-slate-400">
                     <span class="material-symbols-outlined text-5xl mb-2 block">payments</span>
                     Belum ada mutasi cash pada tanggal ini.
                   </td>
@@ -125,24 +131,11 @@
           </table>
         </div>
 
-        <div class="p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="p-5 bg-slate-50 border-t border-slate-200">
           <p class="text-sm text-slate-500">
             Showing <span class="font-bold text-slate-800">{{ cashRows().length }}</span> rows
-            from <span class="font-bold text-slate-800">{{ totalItems() }}</span> transactions
+            from <span class="font-bold text-slate-800">{{ totalItems() }}</span> balance movements
           </p>
-          <div class="flex gap-2">
-            <button
-              class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold disabled:opacity-50"
-              [disabled]="currentPage() <= 1"
-              (click)="prevPage()">
-              Previous
-            </button>
-            <button
-              class="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold"
-              (click)="nextPage()">
-              Next
-            </button>
-          </div>
         </div>
       }
     </section>

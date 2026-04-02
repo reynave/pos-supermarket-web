@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,9 +12,13 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
+  @ViewChild('userIdInput') userIdInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
+
   userId = '';
   password = '';
+  activeField = signal<'userId' | 'password'>('userId');
   showPassword = signal(false);
   loading = signal(false);
   errorMessage = signal('');
@@ -30,6 +34,11 @@ export class LoginComponent {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/menu']);
     }
+  }
+
+  ngAfterViewInit(): void {
+    // Keep default cursor on Staff ID when page opens.
+    queueMicrotask(() => this.focusField('userId'));
   }
 
   togglePassword(): void {
@@ -63,6 +72,60 @@ export class LoginComponent {
           this.errorMessage.set(msg);
         },
       });
+  }
+
+  onUserIdEnter(): void {
+    this.focusField('password');
+  }
+
+  setActiveField(field: 'userId' | 'password'): void {
+    this.activeField.set(field);
+  }
+
+  appendDigit(digit: string): void {
+    if (this.activeField() === 'userId') {
+      this.userId = `${this.userId}${digit}`;
+      this.focusField('userId');
+      return;
+    }
+
+    this.password = `${this.password}${digit}`;
+    this.focusField('password');
+  }
+
+  clearActiveField(): void {
+    if (this.activeField() === 'userId') {
+      this.userId = '';
+      this.focusField('userId');
+      return;
+    }
+
+    this.password = '';
+    this.focusField('password');
+  }
+
+  backspaceActiveField(): void {
+    if (this.activeField() === 'userId') {
+      this.userId = this.userId.slice(0, -1);
+      this.focusField('userId');
+      return;
+    }
+
+    this.password = this.password.slice(0, -1);
+    this.focusField('password');
+  }
+
+  focusNextField(): void {
+    this.focusField(this.activeField() === 'userId' ? 'password' : 'userId');
+  }
+
+  private focusField(field: 'userId' | 'password'): void {
+    this.activeField.set(field);
+    if (field === 'userId') {
+      this.userIdInput?.nativeElement.focus();
+      return;
+    }
+    this.passwordInput?.nativeElement.focus();
   }
 
   goToSetup(){
