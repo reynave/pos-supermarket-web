@@ -1,5 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/services/auth.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 import {
   DailyCloseHistoryItem,
@@ -11,7 +13,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 @Component({
   selector: 'app-daily-close-history',
   standalone: true,
-  imports: [CommonModule, CurrencyIdrPipe],
+  imports: [CommonModule, CurrencyIdrPipe, HeaderComponent],
   templateUrl: './daily-close-history.component.html',
   styleUrl: './daily-close-history.component.css',
 })
@@ -19,10 +21,13 @@ export class DailyCloseHistoryComponent implements OnInit {
   loading = signal(false);
   historyItems = signal<DailyCloseHistoryItem[]>([]);
   totalItems = signal(0);
+  userName = '';
 
-  constructor(private dailyCloseService: DailyCloseService) {}
+  constructor(private dailyCloseService: DailyCloseService, private authService: AuthService) {}
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    this.userName = user?.name ?? 'User';
     this.loadHistory();
   }
 

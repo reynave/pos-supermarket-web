@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ManualCashService, ManualCashSummaryResponse } from '../../../core/services/manual-cash.service';
 import { SessionService } from '../../../core/services/session.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 
 @Component({
   selector: 'app-manual-cash-in',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HeaderComponent],
   templateUrl: './manual-cash-in.component.html',
   styleUrl: './manual-cash-in.component.css',
 })

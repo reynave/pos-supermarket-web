@@ -2,6 +2,8 @@ import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../../core/services/auth.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { SessionService } from '../../../core/services/session.service';
@@ -27,13 +29,14 @@ interface CashBalanceRow {
 @Component({
   selector: 'app-cash-balance',
   standalone: true,
-  imports: [CommonModule, CurrencyIdrPipe, RouterModule],
+  imports: [CommonModule, CurrencyIdrPipe, RouterModule, HeaderComponent],
   templateUrl: './cash-balance.component.html',
   styleUrl: './cash-balance.component.css',
 })
 export class CashBalanceComponent implements OnInit {
   loading = signal(false);
   selectedResetId = signal('');
+  userName = '';
 
   openingBalance = signal(0);
   cashRows = signal<CashBalanceRow[]>([]);
@@ -59,10 +62,13 @@ export class CashBalanceComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private authService: AuthService,
     private sessionService: SessionService,
   ) {}
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    this.userName = user?.name ?? 'User';
     const activeResetId = this.sessionService.session()?.resetId || this.sessionService.session()?.shiftId || '';
     this.selectedResetId.set(activeResetId);
     this.loadData();

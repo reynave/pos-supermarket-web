@@ -11,6 +11,7 @@ interface MenuModule {
   route?: string;
   requiresShift: boolean;
   action?: 'logout';
+  openInNewTab?: boolean;
 }
 
 @Component({
@@ -31,12 +32,15 @@ export class MainMenuComponent implements OnInit, OnDestroy {
 
   modules: MenuModule[] = [
     { icon: 'shopping_cart', title: 'Cart', description: 'Process customer transactions and payments', route: '/cart', requiresShift: true },
+    { icon: 'monitor', title: 'Customer Display', description: 'Customer display for ongoing transactions', route: '/display', requiresShift: true, openInNewTab: true },
+    
     { icon: 'add_card', title: 'Manual Cash In', description: 'Manual addition of cash balance in active shift', route: '/manual-cash-in', requiresShift: true },
     { icon: 'event_repeat', title: 'Daily Close', description: 'Close active shift and submit end-of-day summary', route: '/daily-close', requiresShift: true },
     { icon: 'point_of_sale', title: 'Cash Balance', description: 'Manage cash balances and transactions', route: '/cash-balance', requiresShift: false },
     { icon: 'document_search', title: 'Reports', description: 'Shift Report and Daily Close Report', route: '/report-submenu', requiresShift: false },
     { icon: 'tune', title: 'Settings', description: 'Hardware, printers and terminal configuration', route: '', requiresShift: false },
     { icon: 'logout', title: 'Logout', description: 'Sign out from this terminal', requiresShift: false, action: 'logout' },
+  
   ];
 
   constructor(
@@ -68,6 +72,13 @@ export class MainMenuComponent implements OnInit, OnDestroy {
       this.router.navigate(['/daily-start']);
       return;
     }
+
+    if (mod.openInNewTab) {
+      const url = this.router.serializeUrl(this.router.createUrlTree([mod.route]));
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
     this.router.navigate([mod.route]);
   }
 

@@ -1,34 +1,5 @@
 <div class="min-h-screen bg-background-light text-slate-900">
-  <header class="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
-   
-    <div class="flex items-center gap-3">
-      <button (click)="goBack()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
-        <span class="material-symbols-outlined">arrow_back</span>  
-      </button>
-      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
-        <span class="material-symbols-outlined">point_of_sale</span>
-      </div>
-      <div>
-        <h2 class="text-lg font-bold tracking-tight">Cash Balance</h2>
-        <p class="text-xs text-slate-500">Mutasi kas cash drawer terminal POS</p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 h-11 shadow-sm">
-        <span class="text-sm font-semibold text-slate-600">Reset ID</span>
-        <span class="text-sm font-bold text-slate-900">{{ selectedResetId() || '-' }}</span>
-      </div>
-      <a
-        [routerLink]="['/manual-cash-in']"
-        class="inline-flex items-center gap-2 rounded-xl h-11 px-4 bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm font-semibold">
-        <span class="material-symbols-outlined text-[20px]">add_card</span>
-        <span>Manual Cash In</span>
-      </a>
-    </div>
-
-  
-  </header>
+  <app-header [title]="'Cash Balance'" [userName]="userName"></app-header>
 
   <main class="max-w-7xl mx-auto px-4 lg:px-10 py-4 space-y-8">
    

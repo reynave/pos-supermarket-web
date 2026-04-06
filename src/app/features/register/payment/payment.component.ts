@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { SessionService } from '../../../core/services/session.service';
 import { SocketService } from '../../../core/services/socket.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { Transaction } from '../../../core/models/transaction.model';
@@ -32,7 +33,7 @@ export interface PaidEntry {
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyIdrPipe],
+  imports: [CommonModule, FormsModule, CurrencyIdrPipe, HeaderComponent],
   templateUrl: './payment.component.html',
   styleUrl: './payment.component.css',
 })
@@ -77,6 +78,7 @@ export class PaymentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.socketService.connect();
     const user = this.authService.currentUser();
     this.userName = user?.name ?? 'Cashier';
     this.loadPaymentTypes();
@@ -182,6 +184,7 @@ export class PaymentComponent implements OnInit {
           if (res.success && res.data) {
             this.paidEntries.set(res.data.payments);
             this.totalPaid.set(res.data.totalPaid);
+            this.emitDisplayReload();
           }
         },
         error: () => {},
@@ -216,6 +219,7 @@ export class PaymentComponent implements OnInit {
             this.paidEntries.set(res.data.payments);
             this.totalPaid.set(res.data.totalPaid);
             this.entryAmount.set('0');
+            this.emitDisplayReload();
           } else {
             this.errorMessage.set('Gagal menambah pembayaran');
             setTimeout(() => this.errorMessage.set(''), 3000);
@@ -243,6 +247,7 @@ export class PaymentComponent implements OnInit {
           if (res.success && res.data) {
             this.paidEntries.set(res.data.payments);
             this.totalPaid.set(res.data.totalPaid);
+            this.emitDisplayReload();
           }
         },
         error: (err) => {
@@ -280,7 +285,7 @@ export class PaymentComponent implements OnInit {
           const primaryMethod = this.paidEntries()[0]?.paymentTypeId?.toLowerCase() ?? 'cash';
           this.cartService.saveForReceipt(res.data, primaryMethod);
           this.cartService.clearKioskUuid();
-          this.socketService.emit('display:update', { items: [], subtotal: 0, tax: 0, total: 0 });
+          this.emitDisplayReload(true);
           this.router.navigate(['/receipt'], { queryParams: { id: res.data.id }, replaceUrl: true });
         } else {
           this.errorMessage.set('Pembayaran gagal diselesaikan');
@@ -301,6 +306,14 @@ export class PaymentComponent implements OnInit {
     if (id === 'CASH') return 'payments';
     if (id.includes('QRIS')) return 'qr_code_2';
     return 'credit_card';
+  }
+
+  private emitDisplayReload(forceClear = false): void {
+    this.socketService.emit('display:update', {
+      kioskUuid: this.cartService.kioskUuid(),
+      forceClear,
+      refreshAt: Date.now(),
+    });
   }
 
   goBack(): void {

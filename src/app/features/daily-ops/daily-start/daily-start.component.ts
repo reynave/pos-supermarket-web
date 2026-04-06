@@ -3,12 +3,14 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionService } from '../../../core/services/session.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 
 @Component({
   selector: 'app-daily-start',
   standalone: true,
+  imports: [HeaderComponent],
   templateUrl: './daily-start.component.html',
   styleUrl: './daily-start.component.css',
 })

@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { ItemService } from '../../../core/services/item.service';
 import { SocketService } from '../../../core/services/socket.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 import { AutoFocusDirective } from '../../../shared/directives/auto-focus.directive';
@@ -13,7 +14,7 @@ import { AutoFocusDirective } from '../../../shared/directives/auto-focus.direct
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyIdrPipe, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CurrencyIdrPipe, AutoFocusDirective, HeaderComponent],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css',
 })
@@ -391,10 +392,9 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private emitDisplayUpdate(): void {
     this.socketService.emit('display:update', {
-      items: this.cartService.cart(),
-      subtotal: this.cartService.subtotal(),
-      tax: this.cartService.taxTotal(),
-      total: this.cartService.grandTotal(),
+      kioskUuid: this.cartService.kioskUuid(),
+      forceClear: !this.cartService.kioskUuid(),
+      refreshAt: Date.now(),
     });
   }
 }

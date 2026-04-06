@@ -1,33 +1,7 @@
 <!-- Main POS Interface -->
 <main class="flex h-screen flex-col overflow-hidden bg-background-light">
   <!-- Top Navigation / Status Bar -->
-  <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 shrink-0">
-
-    <div class="flex gap-4 text-primary">
-      <button class="flex  gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold transition-colors"
-        (click)="goToMenu()">
-        <span class="material-symbols-outlined">home</span>
-        Menu
-      </button>
-    </div>
-    <div class="flex items-center gap-4 px-3">
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-        <span class="font-mono text-slate-600 text-sm">{{ currentTime() }}</span>
-      </div>
-      <div class="h-8 w-px bg-slate-200 mx-2"></div>
-      <div class="flex items-center gap-3">
-        <div class="text-right">
-          <p class="text-sm font-bold">Register {{ terminalId }}</p>
-          <p class="text-xs text-slate-500">{{ userName }}</p>
-        </div>
-        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold">
-          {{ userName.charAt(0) }}
-        </div>
-      </div>
-
-    </div>
-  </header>
+  <app-header [title]="'Register ' + terminalId" [userName]="userName"></app-header>
 
   <!-- Error banner -->
   @if (errorMessage()) {

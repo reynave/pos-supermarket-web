@@ -1,18 +1,6 @@
 <div class="min-h-screen bg-background-light flex flex-col">
   <!-- Top Navigation Bar -->
-  <header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white px-6 py-4 lg:px-10">
-    <div class="flex items-center gap-4">
-      <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
-        <span class="material-symbols-outlined">point_of_sale</span>
-      </div>
-      <h2 class="text-slate-900 text-xl font-bold leading-tight tracking-tight">POS System</h2>
-    </div>
-    <div class="flex flex-1 justify-end gap-4">
-      <button class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" (click)="goToMenu()">
-        <span class="material-symbols-outlined">home</span>
-      </button>
-    </div>
-  </header>
+  <app-header [title]="'Daily Sales Report'" [userName]="userName"></app-header>
 
   <main class="flex flex-1 flex-col px-4 py-8 lg:px-10 max-w-[1200px] mx-auto w-full">
     <!-- Header Section with Date Selector -->
@@ -107,11 +95,5 @@
     </div>
   </main>
 
-  <!-- Print FAB -->
-  <div class="fixed bottom-8 right-8 z-50">
-    <button class="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-4 rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95">
-      <span class="material-symbols-outlined text-2xl">print</span>
-      <span class="text-lg font-bold tracking-wide">Print Report</span>
-    </button>
-  </div>
+  
 </div>

@@ -1,24 +1,6 @@
 <main class="flex h-screen flex-col overflow-hidden bg-background-light">
   <!-- Header -->
-  <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-    <div class="flex items-center gap-4">
-      <div class="flex items-center gap-3 text-primary">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 text-primary">
-          <span class="material-symbols-outlined text-2xl">receipt_long</span>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-slate-900">Transaction Complete</h1>
-          <p class="text-xs text-slate-500">Ref: {{ cartService.lastTransaction()?.id }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <p class="text-sm font-bold">{{ userName }}</p>
-      <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold text-sm">
-        {{ userName.charAt(0) }}
-      </div>
-    </div>
-  </header>
+  <app-header [title]="'Transaction Complete'" [userName]="userName"></app-header>
 
   @if (loadError) {
     <div class="bg-red-50 border-b border-red-200 text-red-700 px-6 py-2 text-sm font-medium flex items-center gap-2">
@@ -28,45 +10,18 @@
   }
 
   <!-- Content -->
-  <div class="flex-1 overflow-hidden flex p-8 gap-8 max-w-6xl mx-auto w-full">
+  <div class="flex-1 overflow-hidden flex p-3 gap-8 max-w-6xl mx-auto w-full">
     <!-- Receipt Preview -->
-    <div class="flex-1 flex flex-col items-center overflow-y-auto bg-slate-100 rounded-2xl p-8">
-      <div class="receipt-paper bg-white w-full max-w-md p-8 font-mono text-sm leading-relaxed text-slate-800 shadow-lg">
-        <div class="text-center mb-6">
-          <span class="material-symbols-outlined text-primary text-3xl">local_mall</span>
-          <h3 class="font-bold text-lg uppercase tracking-wider mt-2">Supermarket POS</h3>
-          <p class="text-xs">Terminal: {{ terminalId }}</p>
-        </div>
-        <div class="border-b border-dashed border-slate-300 pb-4 mb-4">
-          <div class="flex justify-between"><span>Date:</span><span>{{ cartService.lastTransaction()?.inputDate }}</span></div>
-          <div class="flex justify-between"><span>Cashier:</span><span>{{ userName }}</span></div>
-          <div class="flex justify-between font-bold"><span>Order ID:</span><span>{{ cartService.lastTransaction()?.id }}</span></div>
-        </div>
-        <div class="border-b border-dashed border-slate-300 pb-4 mb-4 space-y-2">
-          @for (item of cartService.lastCartItems(); track item.id) {
-            <div class="flex justify-between">
-              <span class="flex-1">{{ item.name }}</span>
-              <span class="w-12 text-right">x{{ item.qty }}</span>
-              <span class="w-24 text-right">{{ item.total | currencyIdr }}</span>
-            </div>
-          }
-        </div>
-        <div class="space-y-1 mb-6">
-          <div class="flex justify-between"><span>Subtotal</span><span>{{ cartService.lastTransaction()?.subtotal | currencyIdr }}</span></div>
-          <div class="flex justify-between"><span>Tax</span><span>{{ cartService.lastTransaction()?.tax | currencyIdr }}</span></div>
-          <div class="flex justify-between font-bold text-lg pt-2 border-t border-slate-200">
-            <span>TOTAL</span>
-            <span>{{ cartService.lastTransaction()?.grandTotal | currencyIdr }}</span>
-          </div>
-        </div>
-        <div class="text-center mt-8">
-          <p class="text-xs italic">Thank you for shopping with us!</p>
-        </div>
-      </div>
+    <div class="flex-1 flex flex-col items-center bg-slate-100 rounded-2xl p-3">
+      
+      <pre class="receipt-paper receipt-text bg-white p-4 shadow-lg">{{ renderedReceiptText }}</pre>
     </div>
+
 
     <!-- Action Buttons -->
     <div class="w-1/3 flex flex-col gap-4">
+     
+
       <button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-primary text-white shadow-lg shadow-orange-200 hover:scale-[1.02] transition-transform active:scale-95" (click)="printReceipt()">
         <span class="material-symbols-outlined text-3xl">print</span>
         <div class="text-left">
@@ -74,20 +29,7 @@
           <p class="text-sm opacity-80">Thermal printer</p>
         </div>
       </button>
-      <button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors active:scale-95">
-        <span class="material-symbols-outlined text-primary text-3xl">share</span>
-        <div class="text-left">
-          <p class="text-lg font-bold leading-none">SEND WHATSAPP</p>
-          <p class="text-sm text-slate-500">Digital receipt</p>
-        </div>
-      </button>
-      <button class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors active:scale-95">
-        <span class="material-symbols-outlined text-primary text-3xl">mail</span>
-        <div class="text-left">
-          <p class="text-lg font-bold leading-none">EMAIL RECEIPT</p>
-          <p class="text-sm text-slate-500">Send to inbox</p>
-        </div>
-      </button>
+     
 
        <button
         class="flex items-center gap-4 w-full p-6 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors active:scale-95"

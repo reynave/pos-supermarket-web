@@ -103,11 +103,13 @@
 - [x] `receipt.component.ts` — preview struk, print, new transaction
 - [x] `receipt.component.html` — full page (bukan overlay lagi)
 - [x] `receipt.component.css` — host styling + receipt paper zigzag
+- [x] Receipt Preview now renders backend Handlebars HTML (`receiptHtml`) from `/api/transactions/:id?renderReceiptHtml=true&template=bill.hbs`
+- [x] Handlebars source template kept as original `.hbs` file in backend `public/template/` for user customization
 - **Source**: `stitch_pos_retail_supermaket/transaction_details_receipt_preview/code.html`
 - **Route**: `/receipt`
 - **Flow**: dari Payment → complete → `/receipt?id={transactionId}` → New Transaction → `/cart`
 - **Reuse Flow**: dari Report klik Detail → `/receipt?id={transactionId}` (reprint)
-- **Data Source**: jika ada query param `id`, Receipt fetch `GET /api/transactions/:id`; fallback ke `CartService.lastTransaction` untuk flow lama
+- **Data Source**: jika ada query param `id`, Receipt fetch `GET /api/transactions/:id` + optional rendered HTML; fallback ke `CartService.lastTransaction` untuk flow lama
 
 ### 2.7 Daily Close Dashboard
 - [x] `daily-close.component.ts`
@@ -141,6 +143,9 @@
 - [x] `customer-display.component.ts`
 - [x] `customer-display.component.html`
 - [x] `customer-display.component.css`
+- [x] Multipayment breakdown tampil di customer display (list metode + nominal + total paid + remaining)
+- [x] Customer display restore snapshot dari backend (`cart/list` + `payment/pending`) saat refresh/F5
+- [x] Socket-driven reload: event `display:update` memicu reload data terbaru by `kioskUuid`
 - **Source**: `stitch_pos_retail_supermaket/customer_facing_display_1/code.html`
 - **Alt Source**: `stitch_pos_retail_supermaket/customer_facing_display_2/code.html`
 - **Route**: `/display`
@@ -160,6 +165,8 @@
 - [x] Report API → GET /api/transactions?date=&page=&limit= (paginated, with payment type)
 - [x] Report Reprint Link → tombol Detail membuka `/receipt?id={transactionId}`
 - [x] Socket.IO customer display → server relays display:update to terminal room
+- [x] Payment live refresh emit → add/remove/load pending/complete mengirim socket trigger ke customer display
+- [x] Payment page hardening → `socketService.connect()` dipastikan aktif saat route `/payment` dibuka langsung/refresh
 
 ## Phase 4: Final
 - [x] Full build clean (`ng build --configuration=production`)
@@ -184,9 +191,9 @@
 ---
 
 ## Last Updated
-- **Date**: 2026-04-02
-- **Last Completed Step**: Dedicated Daily Close endpoints aktif, startup runtime config (`public/connection.js`) sinkron, dan route tambahan report history/submenu sudah wired.
-- **Next Step**: Jalankan E2E test full closing flow + hardening UX untuk error/offline/device.
+- **Date**: 2026-04-06
+- **Last Completed Step**: Customer display multipayment + live reload via socket sudah aktif; add/delete payment sekarang langsung trigger refresh data customer display.
+- **Next Step**: Jalankan verifikasi manual multi-device (2 browser: cashier + customer display) lalu lanjut hardening debounce/retry untuk event refresh realtime.
 
 ### Route Summary
 | Route | Component | Guard |

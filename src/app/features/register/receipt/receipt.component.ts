@@ -4,16 +4,27 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { CartItem } from '../../../core/models/item.model';
 import { Transaction } from '../../../core/models/transaction.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
+interface ReceiptPaymentMethod {
+  id: number;
+  paymentTypeId: string;
+  paymentLabel: string;
+  paymentName: string;
+  amount: number;
+  reference: string;
+  approvedCode: string;
+}
+
 @Component({
   selector: 'app-receipt',
   standalone: true,
-  imports: [CommonModule, CurrencyIdrPipe],
+  imports: [CommonModule, CurrencyIdrPipe, HeaderComponent],
   templateUrl: './receipt.component.html',
   styleUrl: './receipt.component.css',
 })
@@ -21,6 +32,9 @@ export class ReceiptComponent implements OnInit {
   userName = '';
   terminalId = environment.terminalId;
   loadError = '';
+  renderedReceiptText = '';
+  paymentMethods: ReceiptPaymentMethod[] = [];
+  totalPaidAmount = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,8 +62,8 @@ export class ReceiptComponent implements OnInit {
 
   private loadReceiptById(id: string): void {
     this.http
-      .get<ApiResponse<{ transaction: Transaction; items: CartItem[]; primaryPaymentTypeId: string }>>(
-        `${environment.apiUrl}/transactions/${id}`,
+      .get<ApiResponse<{ transaction: Transaction; items: CartItem[]; paymentMethods?: ReceiptPaymentMethod[]; primaryPaymentTypeId: string; receiptHtml?: string }>>(
+        `${environment.apiUrl}/transactions/${id}?renderReceiptHtml=true&template=bill.hbs`,
       )
       .subscribe({
         next: (res) => {
@@ -57,6 +71,9 @@ export class ReceiptComponent implements OnInit {
             this.cartService.lastTransaction.set(res.data.transaction);
             this.cartService.lastCartItems.set(res.data.items ?? []);
             this.cartService.lastPaymentMethod.set((res.data.primaryPaymentTypeId || 'CASH').toLowerCase());
+            this.paymentMethods = res.data.paymentMethods ?? [];
+            this.totalPaidAmount = this.paymentMethods.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+            this.renderedReceiptText = res.data.receiptHtml ?? '';
           } else {
             this.loadError = 'Data receipt tidak ditemukan. Silakan cek ID transaksi.';
           }

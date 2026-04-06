@@ -1,0 +1,24 @@
+<header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+  <!-- Left: Back Button -->
+  <button
+    
+    class="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-slate-100 transition-colors text-slate-600 hover:text-slate-900"
+    (click)="goBack()"
+    title="Back">
+    <span class="material-symbols-outlined text-2xl">arrow_back</span>
+  </button>
+  <div  class="w-10"></div>
+
+  <!-- Center: Title -->
+  <div class="flex-1 flex flex-col items-center justify-center">
+    <h1 class="text-xl font-bold tracking-tight text-slate-900">{{ title }}</h1>
+  </div>
+
+  <!-- Right: User Info -->
+  <div class="flex items-center gap-3">
+      <p class="text-sm font-bold">{{ userName }}</p>
+      <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold text-sm">
+        {{ userName.charAt(0) }}
+      </div>
+    </div>
+</header>

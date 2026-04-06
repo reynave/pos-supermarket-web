@@ -1,26 +1,6 @@
 <main class="flex h-screen flex-col overflow-hidden bg-background-light">
   <!-- Header -->
-  <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-    <div class="flex items-center gap-4">
-      <button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-semibold transition-colors" (click)="goBack()">
-        <span class="material-symbols-outlined">arrow_back</span>
-        Back to Cart
-      </button>
-      <div class="h-8 w-px bg-slate-200"></div>
-      <div class="flex items-center gap-3 text-primary">
-        <span class="material-symbols-outlined text-2xl">payments</span>
-        <h1 class="text-xl font-bold tracking-tight text-slate-900">Checkout Payment</h1>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <p class="text-sm text-slate-500">Items: {{ cartService.itemCount() }}</p>
-      <div class="h-8 w-px bg-slate-200"></div>
-      <p class="text-sm font-bold">{{ userName }}</p>
-      <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-primary font-bold text-sm">
-        {{ userName.charAt(0) }}
-      </div>
-    </div>
-  </header>
+  <app-header [title]="'Checkout Payment'" [userName]="userName"></app-header>
 
   <!-- Error banner -->
   @if (errorMessage()) {

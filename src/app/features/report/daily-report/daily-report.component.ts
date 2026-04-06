@@ -2,6 +2,8 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../../core/services/auth.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { Transaction } from '../../../core/models/transaction.model';
@@ -10,7 +12,7 @@ import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 @Component({
   selector: 'app-daily-report',
   standalone: true,
-  imports: [CommonModule, CurrencyIdrPipe],
+  imports: [CommonModule, CurrencyIdrPipe, HeaderComponent],
   templateUrl: './daily-report.component.html',
   styleUrl: './daily-report.component.css',
 })
@@ -21,13 +23,17 @@ export class DailyReportComponent implements OnInit {
   currentPage = signal(1);
   totalItems = signal(0);
   pageSize = 20;
+  userName = '';
 
   constructor(
     private http: HttpClient,
     private router: Router,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    this.userName = user?.name ?? 'User';
     this.loadTransactions();
   }
 

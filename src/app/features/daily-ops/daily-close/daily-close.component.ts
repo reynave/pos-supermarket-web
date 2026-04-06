@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionService } from '../../../core/services/session.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 import { CashDeclarationPayload, DailyCloseService, DailyCloseSummaryResponse } from '../../../core/services/daily-close.service';
@@ -30,7 +31,7 @@ interface DenominationRow {
 @Component({
   selector: 'app-daily-close',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, CurrencyIdrPipe],
+  imports: [CommonModule, FormsModule, RouterLink, CurrencyIdrPipe, HeaderComponent],
   templateUrl: './daily-close.component.html',
   styleUrl: './daily-close.component.css',
 })
