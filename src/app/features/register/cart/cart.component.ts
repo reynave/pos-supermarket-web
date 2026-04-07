@@ -20,6 +20,7 @@ import { AutoFocusDirective } from '../../../shared/directives/auto-focus.direct
 })
 export class CartComponent implements OnInit, OnDestroy {
   private clockInterval: ReturnType<typeof setInterval> | null = null;
+  private recoveringMissingSession = false;
 
   searchQuery : string = '';
   keypadInput = signal('0');
@@ -76,15 +77,36 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService.loadCart(kioskUuid).subscribe({
       next: (data) => {
         this.loading.set(false);
-        if (data) {
-          this.emitDisplayUpdate();
+        if (!data) {
+          this.handleMissingKioskSession();
+          return;
         }
+
+        this.emitDisplayUpdate();
       },
       error: () => {
         this.loading.set(false);
-        this.errorMessage.set('Failed to load cart');
-        setTimeout(() => this.errorMessage.set(''), 3000);
+        this.handleMissingKioskSession();
       },
+    });
+  }
+
+  private handleMissingKioskSession(): void {
+    if (this.recoveringMissingSession) return;
+
+    this.recoveringMissingSession = true;
+    this.cartService.clearKioskUuid();
+    this.cartService.clearCart();
+    this.errorMessage.set('Session lama tidak ditemukan. Membuat session baru...');
+
+    this.initCartSession(() => {
+      this.recoveringMissingSession = false;
+      this.errorMessage.set('');
+      this.httpGetItem();
+    }, () => {
+      this.recoveringMissingSession = false;
+      this.errorMessage.set('Failed to create cart session');
+        setTimeout(() => this.errorMessage.set(''), 3000);
     });
   }
 
@@ -94,7 +116,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /** Create new cart session via POST /api/cart/new */
-  private initCartSession(): void {
+  private initCartSession(onSuccess?: () => void, onError?: () => void): void {
     const user = this.authService.currentUser();
     this.cartService.createNewCart(
       user?.id ?? '',
@@ -103,13 +125,21 @@ export class CartComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (res) => {
         if (!res.success) {
+          onError?.();
+          if (!onError) {
+            this.errorMessage.set('Failed to create cart session');
+            setTimeout(() => this.errorMessage.set(''), 3000);
+          }
+          return;
+        }
+        onSuccess?.();
+      },
+      error: () => {
+        onError?.();
+        if (!onError) {
           this.errorMessage.set('Failed to create cart session');
           setTimeout(() => this.errorMessage.set(''), 3000);
         }
-      },
-      error: () => {
-        this.errorMessage.set('Failed to create cart session');
-        setTimeout(() => this.errorMessage.set(''), 3000);
       },
     });
   }
@@ -147,7 +177,8 @@ export class CartComponent implements OnInit, OnDestroy {
       next: (item) => {
         this.loading.set(false);
         if (item) {
-          this.cartService.addItem(item);
+         // this.cartService.addItem(item);
+         this.httpGetItem(); // Reload cart from backend to keep state aligned with DB rows (e.g. for promotions, stock changes, etc)
           this.emitDisplayUpdate();
         } else {
           this.errorMessage.set('Item not found');

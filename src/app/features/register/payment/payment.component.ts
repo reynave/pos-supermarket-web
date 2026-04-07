@@ -43,6 +43,11 @@ export class PaymentComponent implements OnInit {
   // Payment type panel
   paymentTypes = signal<PaymentType[]>([]);
   selectedTypeId = signal<string>('CASH');
+  isPaymentTypeModalOpen = signal(false);
+  selectedTypeLabel = computed(() => {
+    const selected = this.paymentTypes().find((type) => type.id === this.selectedTypeId());
+    return selected?.label || this.selectedTypeId();
+  });
 
   // Entry amount keypad
   entryAmount = signal('0');
@@ -141,6 +146,15 @@ export class PaymentComponent implements OnInit {
     // Pre-fill remaining amount when selecting a payment type
     const remaining = this.remaining();
     this.entryAmount.set(remaining > 0 ? String(remaining) : '0');
+    this.isPaymentTypeModalOpen.set(false);
+  }
+
+  openPaymentTypeModal(): void {
+    this.isPaymentTypeModalOpen.set(true);
+  }
+
+  closePaymentTypeModal(): void {
+    this.isPaymentTypeModalOpen.set(false);
   }
 
   // ─── Keypad ───────────────────────────────────────────────────────────────

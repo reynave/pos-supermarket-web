@@ -38,7 +38,7 @@ export class MainMenuComponent implements OnInit, OnDestroy {
     { icon: 'event_repeat', title: 'Daily Close', description: 'Close active shift and submit end-of-day summary', route: '/daily-close', requiresShift: true },
     { icon: 'point_of_sale', title: 'Cash Balance', description: 'Manage cash balances and transactions', route: '/cash-balance', requiresShift: false },
     { icon: 'document_search', title: 'Reports', description: 'Shift Report and Daily Close Report', route: '/report-submenu', requiresShift: false },
-    { icon: 'tune', title: 'Settings', description: 'Hardware, printers and terminal configuration', route: '', requiresShift: false },
+    { icon: 'tune', title: 'Settings', description: 'Hardware, printers and terminal configuration', route: '/setting-submenu', requiresShift: false },
     { icon: 'logout', title: 'Logout', description: 'Sign out from this terminal', requiresShift: false, action: 'logout' },
   
   ];

@@ -23,4 +23,7 @@ export interface CartItem {
   tax: number;
   total: number;
   uom: string;
+  promotionId?: string | null;
+  promotionItemId?: number | null;
+  promotionName?: string | null;
 }

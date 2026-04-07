@@ -26,6 +26,24 @@ export const routes: Routes = [
       import('./features/menu/report-submenu/report-submenu.component').then((m) => m.ReportSubmenuComponent),
   },
   {
+    path: 'setting-submenu',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/menu/setting-submenu/setting-submenu.component').then((m) => m.SettingSubmenuComponent),
+  },
+  {
+    path: 'settings/erc-qr',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/erc-qr-settings/erc-qr-settings.component').then((m) => m.ErcQrSettingsComponent),
+  },
+  {
+    path: 'settings/printer-setup',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/printer-setup/printer-setup.component').then((m) => m.PrinterSetupComponent),
+  },
+  {
     path: 'daily-start',
     canActivate: [authGuard],
     loadComponent: () =>

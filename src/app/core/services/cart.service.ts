@@ -31,6 +31,9 @@ interface CartListItem {
   total: number;
   uom: string;
   imageUrl: string | null;
+  promotionId: string | null;
+  promotionItemId: number | null;
+  promotionName: string | null;
 }
 
 export interface CartListResponse {
@@ -150,6 +153,9 @@ export class CartService {
               tax: i.tax,
               total: i.total,
               uom: i.uom,
+              promotionId: i.promotionId ?? null,
+              promotionItemId: i.promotionItemId ?? null,
+              promotionName: i.promotionName ?? null,
             }));
             this.cart.set(cartItems);
             this.selectedIndex.set(-1);

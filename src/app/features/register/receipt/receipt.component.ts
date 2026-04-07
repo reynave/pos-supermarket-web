@@ -91,7 +91,12 @@ export class ReceiptComponent implements OnInit {
 
   newTransaction(): void {
     this.cartService.clearReceipt();
-    this.router.navigate(['/cart']);
+    this.router.navigate(['/menu']).then(() => { 
+      setTimeout(() => {
+         this.router.navigate(['/cart']);
+      }, 200);
+    });
+   
   }
 
   goToMenu(): void {

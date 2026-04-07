@@ -14,27 +14,31 @@
   <div class="flex-1 flex overflow-hidden">
 
     <!-- LEFT: Payment type selector + keypad -->
-    <section class="w-[55%] flex flex-col border-r border-slate-200 overflow-y-auto p-6 gap-5">
+    <section class="w-[55%] flex flex-col border-r border-slate-200 overflow-y-auto p-4 gap-5">
 
       <!-- Total due -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center justify-between shadow-sm">
+      <!-- <div class="bg-white rounded-2xl border border-slate-200 p-5 flex items-center justify-between shadow-sm">
         <p class="text-slate-500 font-semibold uppercase tracking-widest text-sm">Total Tagihan</p>
         <span class="text-4xl font-black text-slate-900 font-mono tracking-tight">{{ cartService.grandTotal() | currencyIdr }}</span>
-      </div>
+      </div> -->
 
       <!-- Payment type buttons -->
       <div>
-        <p class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Jenis Pembayaran</p>
-        <div class="flex flex-wrap gap-3">
-          @for (type of paymentTypes(); track type.id) {
-            <button
-              class="flex items-center gap-2 px-4 py-3 rounded-xl border-2 font-bold text-sm transition-all"
-              [ngClass]="selectedTypeId() === type.id ? 'bg-orange-50 border-primary text-primary' : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'"
-              (click)="selectType(type.id)">
-              <span class="material-symbols-outlined text-xl">{{ paymentTypeIcon(type.id) }}</span>
-              {{ type.label }}
-            </button>
-          }
+         <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Jenis Pembayaran</p>
+            <div class="mt-1 inline-flex items-center gap-2 rounded-lg bg-orange-50 px-3 py-1.5 text-primary font-bold text-sm max-w-full">
+              <span class="material-symbols-outlined text-lg">{{ paymentTypeIcon(selectedTypeId()) }}</span>
+              <span class="truncate">{{ selectedTypeLabel() }}</span>
+            </div>
+          </div>
+
+          <button
+            class="shrink-0 inline-flex items-center gap-2 px-4 py-3 rounded-xl border-2 border-slate-200 bg-white hover:border-primary hover:bg-orange-50 text-slate-700 font-bold text-sm transition-all"
+            (click)="openPaymentTypeModal()">
+            <span class="material-symbols-outlined text-xl">tune</span>
+            Ubah Metode
+          </button>
         </div>
       </div>
 
@@ -45,7 +49,7 @@
       </div>
 
       <!-- Keypad -->
-      <div class="grid grid-cols-4 gap-2">
+      <div class="grid grid-cols-3 gap-3">
         @for (n of [7,8,9,4,5,6,1,2,3]; track n) {
           <button
             class="h-14 bg-white border border-slate-200 hover:bg-slate-50 active:scale-95 text-2xl font-bold rounded-2xl shadow-sm transition-all"
@@ -95,7 +99,7 @@
     </section>
 
     <!-- RIGHT: Paid entries + summary + complete -->
-    <section class="w-[45%] flex flex-col p-6 gap-5 overflow-y-auto">
+    <section class="w-[45%] flex flex-col p-4 gap-5 overflow-y-auto">
 
       <!-- Paid entries table -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex-1">
@@ -186,4 +190,46 @@
     </section>
   </div>
 </main>
+
+@if (isPaymentTypeModalOpen()) {
+  <div class="fixed inset-0 z-[70] flex items-end md:items-center justify-center p-4">
+    <button
+      aria-label="Close payment method modal"
+      class="absolute inset-0 bg-slate-900/50"
+      (click)="closePaymentTypeModal()"></button>
+
+    <section class="relative w-full max-w-2xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+      <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-black text-slate-900">Pilih Jenis Pembayaran</h3>
+          <p class="text-sm text-slate-500">Metode aktif sekarang: <span class="font-bold text-primary">{{ selectedTypeLabel() }}</span></p>
+        </div>
+        <button
+          class="size-10 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors flex items-center justify-center"
+          (click)="closePaymentTypeModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 max-h-[70vh] overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          @for (type of paymentTypes(); track type.id) {
+            <button
+              class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border-2 font-bold text-sm transition-all"
+              [ngClass]="selectedTypeId() === type.id ? 'bg-orange-50 border-primary text-primary' : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'"
+              (click)="selectType(type.id)">
+              <span class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-xl">{{ paymentTypeIcon(type.id) }}</span>
+                <span class="truncate text-left">{{ type.label }}</span>
+              </span>
+              @if (selectedTypeId() === type.id) {
+                <span class="material-symbols-outlined text-xl">check_circle</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+}
 
