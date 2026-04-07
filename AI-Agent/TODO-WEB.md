@@ -60,6 +60,21 @@
 - [x] `report-submenu.component.css`
 - **Route**: `/report-submenu`
 
+### 2.2b Setting Submenu
+- [x] `setting-submenu.component.ts`
+- [x] `setting-submenu.component.html`
+- [x] `setting-submenu.component.css`
+- [x] `erc-qr-settings.component.ts`
+- [x] `erc-qr-settings.component.html`
+- [x] `erc-qr-settings.component.css`
+- [x] `printer-setup.component.ts`
+- [x] `printer-setup.component.html`
+- [x] `printer-setup.component.css`
+- [x] Main menu Settings card routed (no longer "Coming Soon")
+- **Route**: `/setting-submenu`
+- **Sub Routes**: `/settings/erc-qr`, `/settings/printer-setup`
+- **Note**: Initial UI placeholder siap untuk penambahan setting POS berikutnya.
+
 ### 2.3 Daily Start Dashboard
 - [x] `daily-start.component.ts`
 - [x] `daily-start.component.html`
@@ -87,8 +102,9 @@
 
 ### 2.5 Payment (Checkout)
 - [x] `payment.component.ts` — multi-payment (split payment), tipe dari API, keypad, add/remove entry, complete
-- [x] `payment.component.html` — 2-panel layout: kiri keypad + payment types, kanan paid entries table + summary
+- [x] `payment.component.html` — 2-panel layout: kiri keypad + payment selector modal trigger, kanan paid entries table + summary
 - [x] `payment.component.css` — host styling
+- [x] Payment type selector upgraded to popup modal (scalable untuk banyak metode) + active method badge
 - **Source**: `stitch_pos_retail_supermaket/checkout_payment_selection/code.html`
 - **Route**: `/payment`
 - **Flow**: Cart → PAY button → `/payment` → `POST /api/payment/complete` → `/receipt`
@@ -191,9 +207,9 @@
 ---
 
 ## Last Updated
-- **Date**: 2026-04-06
-- **Last Completed Step**: Customer display multipayment + live reload via socket sudah aktif; add/delete payment sekarang langsung trigger refresh data customer display.
-- **Next Step**: Jalankan verifikasi manual multi-device (2 browser: cashier + customer display) lalu lanjut hardening debounce/retry untuk event refresh realtime.
+- **Date**: 2026-04-07
+- **Last Completed Step**: Settings submenu + 2 halaman awal (`ERC and QR`, `Setup Printer`) sudah dibuat dan route aktif dari Main Menu; Payment type selector juga sudah dipindah ke popup modal dengan indikator metode aktif.
+- **Next Step**: Lanjut implementasi action fungsional untuk halaman setting (save config ERC/QR, printer discovery/test print) dan tambah search/filter di modal metode pembayaran jika jumlah metode makin banyak.
 
 ### Route Summary
 | Route | Component | Guard |
@@ -201,6 +217,9 @@
 | `/login` | LoginComponent | — |
 | `/menu` | MainMenuComponent | authGuard |
 | `/report-submenu` | ReportSubmenuComponent | authGuard |
+| `/setting-submenu` | SettingSubmenuComponent | authGuard |
+| `/settings/erc-qr` | ErcQrSettingsComponent | authGuard |
+| `/settings/printer-setup` | PrinterSetupComponent | authGuard |
 | `/daily-start` | DailyStartComponent | authGuard |
 | `/manual-cash-in` | ManualCashInComponent | authGuard + shiftGuard |
 | `/cart` | CartComponent | authGuard + shiftGuard |
