@@ -64,21 +64,29 @@
 - [x] `setting-submenu.component.ts`
 - [x] `setting-submenu.component.html`
 - [x] `setting-submenu.component.css`
-- [x] `erc-qr-settings.component.ts`
-- [x] `erc-qr-settings.component.html`
-- [x] `erc-qr-settings.component.css`
+- [x] `payment-type-settings.component.ts`
+- [x] `payment-type-settings.component.html`
+- [x] `payment-type-settings.component.css`
+- [x] `payment-type-detail.component.ts`
+- [x] `payment-type-detail.component.html`
+- [x] `payment-type-detail.component.css`
 - [x] `printer-setup.component.ts`
 - [x] `printer-setup.component.html`
 - [x] `printer-setup.component.css`
 - [x] Main menu Settings card routed (no longer "Coming Soon")
+- [x] Rename submenu `ERC and QR` -> `Payment Type`
+- [x] Payment Type list page menampilkan field penting + search + action detail
+- [x] Payment Type detail page menampilkan semua field table `payment_type`
 - **Route**: `/setting-submenu`
-- **Sub Routes**: `/settings/erc-qr`, `/settings/printer-setup`
-- **Note**: Initial UI placeholder siap untuk penambahan setting POS berikutnya.
+- **Sub Routes**: `/settings/payment-type`, `/settings/payment-type/:id`, `/settings/printer-setup`
+- **Legacy Redirect**: `/settings/erc-qr` -> `/settings/payment-type`
+- **Note**: Payment Type sudah terhubung ke API backend (`/api/payment/types/all`, `/api/payment/types/:id`).
 
 ### 2.3 Daily Start Dashboard
 - [x] `daily-start.component.ts`
 - [x] `daily-start.component.html`
 - [x] `daily-start.component.css`
+- [x] Fix route setelah start shift: `/home` sekarang valid (tidak fallback ke `/startup`)
 - **Source**: `stitch_pos_retail_supermaket/pos_daily_start_dashboard/code.html`
 - **Route**: `/daily-start`
 
@@ -121,6 +129,7 @@
 - [x] `receipt.component.css` — host styling + receipt paper zigzag
 - [x] Receipt Preview now renders backend Handlebars HTML (`receiptHtml`) from `/api/transactions/:id?renderReceiptHtml=true&template=bill.hbs`
 - [x] Handlebars source template kept as original `.hbs` file in backend `public/template/` for user customization
+- [x] Print action sekarang kirim log ke backend (`POST /api/print/transaction/:transactionId/log`) sebelum trigger browser print
 - **Source**: `stitch_pos_retail_supermaket/transaction_details_receipt_preview/code.html`
 - **Route**: `/receipt`
 - **Flow**: dari Payment → complete → `/receipt?id={transactionId}` → New Transaction → `/cart`
@@ -162,6 +171,7 @@
 - [x] Multipayment breakdown tampil di customer display (list metode + nominal + total paid + remaining)
 - [x] Customer display restore snapshot dari backend (`cart/list` + `payment/pending`) saat refresh/F5
 - [x] Socket-driven reload: event `display:update` memicu reload data terbaru by `kioskUuid`
+- [x] Label promo di daftar item: tampil `promotionName`; fallback `Item Reguler`; warna beda untuk free item vs discounted item
 - **Source**: `stitch_pos_retail_supermaket/customer_facing_display_1/code.html`
 - **Alt Source**: `stitch_pos_retail_supermaket/customer_facing_display_2/code.html`
 - **Route**: `/display`
@@ -207,18 +217,21 @@
 ---
 
 ## Last Updated
-- **Date**: 2026-04-07
-- **Last Completed Step**: Settings submenu + 2 halaman awal (`ERC and QR`, `Setup Printer`) sudah dibuat dan route aktif dari Main Menu; Payment type selector juga sudah dipindah ke popup modal dengan indikator metode aktif.
-- **Next Step**: Lanjut implementasi action fungsional untuk halaman setting (save config ERC/QR, printer discovery/test print) dan tambah search/filter di modal metode pembayaran jika jumlah metode makin banyak.
+- **Date**: 2026-04-08
+- **Last Completed Step**: Revamp Settings submenu ke Payment Type, penambahan list page (field penting) + detail page (semua field `payment_type`), serta wiring API detail/update.
+- **Next Step**: Lanjut E2E test alur utama + hardening UX error state pada flow print/network dan validasi end-to-end edit payment type.
 
 ### Route Summary
 | Route | Component | Guard |
 |-------|-----------|-------|
 | `/login` | LoginComponent | — |
+| `/home` | MainMenuComponent | authGuard |
 | `/menu` | MainMenuComponent | authGuard |
 | `/report-submenu` | ReportSubmenuComponent | authGuard |
 | `/setting-submenu` | SettingSubmenuComponent | authGuard |
-| `/settings/erc-qr` | ErcQrSettingsComponent | authGuard |
+| `/settings/payment-type` | PaymentTypeSettingsComponent | authGuard |
+| `/settings/payment-type/:id` | PaymentTypeDetailComponent | authGuard |
+| `/settings/erc-qr` | Redirect -> `/settings/payment-type` | — |
 | `/settings/printer-setup` | PrinterSetupComponent | authGuard |
 | `/daily-start` | DailyStartComponent | authGuard |
 | `/manual-cash-in` | ManualCashInComponent | authGuard + shiftGuard |

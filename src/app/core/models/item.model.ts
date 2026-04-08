@@ -25,5 +25,7 @@ export interface CartItem {
   uom: string;
   promotionId?: string | null;
   promotionItemId?: number | null;
+  promotionFreeId?: number | null;
   promotionName?: string | null;
+  isFreeItem?: boolean;
 }

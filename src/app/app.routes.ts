@@ -20,6 +20,12 @@ export const routes: Routes = [
       import('./features/menu/main-menu/main-menu.component').then((m) => m.MainMenuComponent),
   },
   {
+    path: 'home',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/menu/main-menu/main-menu.component').then((m) => m.MainMenuComponent),
+  },
+  {
     path: 'report-submenu',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -32,10 +38,21 @@ export const routes: Routes = [
       import('./features/menu/setting-submenu/setting-submenu.component').then((m) => m.SettingSubmenuComponent),
   },
   {
-    path: 'settings/erc-qr',
+    path: 'settings/payment-type',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/settings/erc-qr-settings/erc-qr-settings.component').then((m) => m.ErcQrSettingsComponent),
+      import('./features/settings/payment-type-settings/payment-type-settings.component').then((m) => m.PaymentTypeSettingsComponent),
+  },
+  {
+    path: 'settings/payment-type/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/payment-type-detail/payment-type-detail.component').then((m) => m.PaymentTypeDetailComponent),
+  },
+  {
+    path: 'settings/erc-qr',
+    redirectTo: 'settings/payment-type',
+    pathMatch: 'full',
   },
   {
     path: 'settings/printer-setup',

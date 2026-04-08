@@ -1,0 +1,254 @@
+<div class="min-h-screen bg-background-light flex flex-col">
+  <header class="grid grid-cols-3 items-center border-b border-slate-200 bg-white px-4 md:px-6 py-3 sticky top-0 z-50 gap-3">
+    <div class="justify-self-start">
+      <button
+        class="inline-flex items-center gap-2 rounded-xl h-10 px-3 bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+        (click)="goBack()">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        <span class="text-sm font-semibold">Back</span>
+      </button>
+    </div>
+
+    <div class="justify-self-center text-center">
+      <h1 class="text-xl md:text-2xl font-black tracking-tight text-slate-900">Payment Type Detail</h1>
+    </div>
+
+    <div class="justify-self-end text-right leading-tight">
+      <p class="text-xs text-slate-500">Settings</p>
+      <p class="text-sm font-bold text-slate-900">Update Payment Type</p>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-4xl w-full mx-auto p-6 md:p-8">
+    <section class="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
+      @if (loading()) {
+        <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-8 text-center text-slate-500">
+          Loading payment type detail...
+        </div>
+      } @else {
+        @if (errorMessage()) {
+          <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        @if (successMessage()) {
+          <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {{ successMessage() }}
+          </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">ID</label>
+            <input
+              type="text"
+              [ngModel]="form().id"
+              disabled
+              class="h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-3 text-sm text-slate-700" />
+          </div>
+
+            <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Connection Type</label>
+            <select
+              [ngModel]="form().connectionType"
+              (ngModelChange)="setConnectionType($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
+               
+                <option value="MANUAL">MANUAL</option>
+                <option value="IP">IP</option>
+                <option value="COM">COM</option>
+                <option value="QR-ERC">QR ERC</option>
+                <option value="QR-API">QR API</option>
+              
+            </select>
+          </div>
+
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Label</label>
+            <input
+              type="text"
+              [ngModel]="form().label"
+              (ngModelChange)="onLabelChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Name</label>
+            <input
+              type="text"
+              [ngModel]="form().name"
+              (ngModelChange)="onNameChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Open Cash Drawer</label>
+            <select
+              [ngModel]="form().openCashDrawer"
+              (ngModelChange)="onOpenCashDrawerChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Image</label>
+            <input
+              type="text"
+              [ngModel]="form().image"
+              (ngModelChange)="onImageChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">COM</label>
+            <input
+              type="text"
+              [ngModel]="form().com"
+              (ngModelChange)="onComChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">IP</label>
+            <input
+              type="text"
+              [ngModel]="form().ip"
+              (ngModelChange)="onIpChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Port</label>
+            <input
+              type="text"
+              [ngModel]="form().port"
+              (ngModelChange)="onPortChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">API Key</label>
+            <input
+              type="text"
+              [ngModel]="form().apikey"
+              (ngModelChange)="onApiKeyChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">mId</label>
+            <input
+              type="text"
+              [ngModel]="form().mId"
+              (ngModelChange)="onMidChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">nmId</label>
+            <input
+              type="text"
+              [ngModel]="form().nmId"
+              (ngModelChange)="onNmidChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Merchant</label>
+            <input
+              type="text"
+              [ngModel]="form().merchant"
+              (ngModelChange)="onMerchantChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Timeout</label>
+            <input
+              type="number"
+              [ngModel]="form().timeout"
+              (ngModelChange)="onTimeoutChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">EDC</label>
+            <input
+              type="number"
+              [ngModel]="form().edc"
+              (ngModelChange)="onEdcChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Visible (isLock)</label>
+            <select
+              [ngModel]="form().isLock"
+              (ngModelChange)="onIsLockChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
+              <option [ngValue]="1">Yes</option>
+              <option [ngValue]="0">No</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Status</label>
+            <select
+              [ngModel]="form().status"
+              (ngModelChange)="onStatusChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
+              <option [ngValue]="1">Enable</option>
+              <option [ngValue]="0">Disable</option>
+            </select>
+          </div>
+
+          
+
+        
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">API URL</label>
+            <input
+              type="text"
+              [ngModel]="form().apiUrl"
+              (ngModelChange)="onApiUrlChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">API URL Status</label>
+            <input
+              type="text"
+              [ngModel]="form().apiUrlStatus"
+              (ngModelChange)="onApiUrlStatusChange($event)"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+
+        
+ 
+ 
+ 
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="h-10 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            Cancel
+          </button>
+          <button
+            type="button"
+            [disabled]="saving()"
+            (click)="save()"
+            class="h-10 rounded-xl bg-primary px-4 text-sm font-semibold text-white disabled:opacity-60">
+            {{ saving() ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+      }
+    </section>
+  </main>
+</div>

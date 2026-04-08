@@ -194,6 +194,10 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   selectItem(index: number): void {
+    const item = this.cartService.cart()[index];
+    if (!item || item.isFreeItem) {
+      return;
+    }
     this.cartService.selectedIndex.set(index);
   }
 
@@ -227,14 +231,20 @@ export class CartComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const fromKeypad = parseInt(this.keypadInput(), 10);
-    this.addQtyValue.set(!Number.isNaN(fromKeypad) && fromKeypad > 0 ? fromKeypad : 1);
+    const selected = this.cartService.cart()[idx];
+    if (!selected || selected.isFreeItem) {
+      this.errorMessage.set('Item free tidak bisa diubah qty');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    this.addQtyValue.set(0);
     this.showAddQtyModal.set(true);
   }
 
   cancelAddQty(): void {
     this.showAddQtyModal.set(false);
-    this.addQtyValue.set(1);
+    this.addQtyValue.set(0);
   }
 
   selectedCartItemName(): string {
@@ -260,7 +270,7 @@ export class CartComponent implements OnInit, OnDestroy {
     const selected = this.cartService.cart()[idx];
     const kioskUuid = this.cartService.kioskUuid();
 
-    if (idx < 0 || !selected || qty < 1 || !kioskUuid) return;
+    if (idx < 0 || !selected || qty < 1 || !kioskUuid || selected.isFreeItem) return;
 
     this.loading.set(true);
     this.itemService.addQtyBySelected(kioskUuid, selected.itemId, qty, selected.barcode).subscribe({
@@ -289,12 +299,20 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Open the Void Item modal for selected item */
   voidItem(): void {
     const idx = this.cartService.selectedIndex();
-    if (idx >= 0) {
-      this.voidItemIndex.set(idx);
-      this.voidItemQty.set(1);
-      this.showVoidItemModal.set(true);
+    if (idx < 0) {
+      return;
     }
 
+    const selected = this.cartService.cart()[idx];
+    if (!selected || selected.isFreeItem) {
+      this.errorMessage.set('Item free tidak bisa di-void manual');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    this.voidItemIndex.set(idx);
+    this.voidItemQty.set(1);
+    this.showVoidItemModal.set(true);
   }
 
   /** Cancel/close the Void Item modal */
@@ -406,7 +424,7 @@ export class CartComponent implements OnInit, OnDestroy {
     let nextValue = currentValue;
 
     if (key === 'CLR') {
-      return '' as unknown as number; // Signal will be reset to empty string, which is treated as 0 in display
+      return 0;
     }
 
     if (key === 'backspace') {

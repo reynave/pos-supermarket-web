@@ -84,9 +84,36 @@ export class ReceiptComponent implements OnInit {
       });
   }
 
+  browserPrint(): void {
+    // arakhkan ke url api/transactions/[transactionID]/print-txt?template=bill.hbs, buka windows open
+    const transactionId = this.cartService.lastTransaction()?.id?.trim() ?? '';
+    const printUrl = `${environment.apiUrl}/transactions/${encodeURIComponent(transactionId)}/print-txt?template=bill.hbs`;
+    window.open(printUrl, '_blank', 'width=600,height=800');  
+    
+  }
+
+
   printReceipt(): void {
-    // Future: connect to printer service
-    window.print();
+    const transactionId = this.cartService.lastTransaction()?.id?.trim() ?? '';
+   
+   
+    this.http
+      .post<ApiResponse<{ id: number; transactionId: string; inputDate: string; inputBy: string | null }>>(
+        `${environment.apiUrl}/print/transaction/${encodeURIComponent(transactionId)}/log`,
+        {},
+      )
+      .subscribe({
+        next: () => {
+           this.browserPrint();
+            this.loadReceiptById(transactionId);
+        },
+        error: () => {
+          // Do not block printing when log endpoint fails.
+           this.browserPrint();
+              this.loadReceiptById(transactionId);
+           alert("Error logging print action. Receipt will still be printed, but print log may be incomplete.");
+        },
+      });
   }
 
   newTransaction(): void {

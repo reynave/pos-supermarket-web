@@ -33,7 +33,9 @@ interface CartListItem {
   imageUrl: string | null;
   promotionId: string | null;
   promotionItemId: number | null;
+  promotionFreeId: number | null;
   promotionName: string | null;
+  isFreeItem: boolean;
 }
 
 export interface CartListResponse {
@@ -155,7 +157,9 @@ export class CartService {
               uom: i.uom,
               promotionId: i.promotionId ?? null,
               promotionItemId: i.promotionItemId ?? null,
+              promotionFreeId: i.promotionFreeId ?? null,
               promotionName: i.promotionName ?? null,
+              isFreeItem: Boolean(i.isFreeItem),
             }));
             this.cart.set(cartItems);
             this.selectedIndex.set(-1);

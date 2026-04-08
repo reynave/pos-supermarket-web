@@ -81,7 +81,12 @@ export class DailyStartComponent {
             settlementId: sessionId,
             openingBalance,
           });
-          this.router.navigate(['/cart']);
+          this.router.navigate(['/home']).then(() => { 
+            setTimeout(() => {
+              this.router.navigate(['/cart']);
+            }, 200);
+
+          });
         } else {
           this.errorMessage.set(res.message || 'Failed to open shift');
         }

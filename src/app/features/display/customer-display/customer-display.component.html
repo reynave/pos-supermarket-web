@@ -7,7 +7,7 @@
     </header>
 
     <div class="flex-1 overflow-y-auto px-8 py-4">
-      <table class="w-full text-left border-separate border-spacing-y-4">
+      <table class="w-full text-left border-separate border-spacing-y-2">
         <thead>
           <tr class="text-slate-500 uppercase text-sm font-bold tracking-widest">
             <th class="pb-4">Item Name</th>
@@ -18,9 +18,18 @@
         <tbody class="text-xl">
           @for (item of items(); track item.id) {
             <tr class="bg-slate-50 rounded-xl overflow-hidden">
-              <td class="py-6 px-6 rounded-l-xl font-bold">{{ item.name }}</td>
-              <td class="py-6 px-6 text-center font-medium text-slate-600">{{ item.qty }} {{ item.uom }}</td>
-              <td class="py-6 px-6 text-right font-black rounded-r-xl">{{ item.total | currencyIdr }}</td>
+              <td class="py-2 px-6 rounded-l-xl">
+                <p class="font-bold text-slate-900">{{ item.name }}</p>
+                @if (item.promotionName) {
+                  <p class="  text-sm font-semibold" [class.text-emerald-600]="item.isFreeItem" [class.text-amber-600]="!item.isFreeItem">
+                    {{ item.promotionName }}
+                  </p>
+                } @else {
+                  <p class="  text-sm font-medium text-slate-400">Item Reguler</p>
+                }
+              </td>
+              <td class="py-2 px-6 text-center font-medium text-slate-600">{{ item.qty }} {{ item.uom }}</td>
+              <td class="py-2 px-6 text-right font-black rounded-r-xl">{{ item.total | currencyIdr }}</td>
             </tr>
           }
           @if (items().length === 0) {

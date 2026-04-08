@@ -35,6 +35,8 @@ interface CartSnapshotItem {
   tax: number;
   total: number;
   uom: string;
+  promotionName?: string | null;
+  isFreeItem?: boolean;
 }
 
 interface CartSnapshotResponse {
@@ -124,6 +126,8 @@ export class CustomerDisplayComponent implements OnInit, OnDestroy {
               tax: item.tax,
               total: item.total,
               uom: item.uom,
+              promotionName: item.promotionName ?? null,
+              isFreeItem: Boolean(item.isFreeItem),
             })),
           );
           this.subtotal.set(res.data.subtotal ?? 0);

@@ -38,11 +38,18 @@
         <div class="flex-1 overflow-y-auto p-3">
           @for (item of cartService.cart(); track item.id; let i = $index) {
           <div
-            class="grid grid-cols-12 gap-2 px-2 py-1 mb-2 rounded-xl items-center border shadow-sm cursor-pointer transition-colors"
-            [ngClass]="cartService.selectedIndex() === i ? 'bg-orange-50 border-primary border-l-4 border-l-primary' : 'bg-white border-slate-200'"
+            class="grid grid-cols-12 gap-2 px-2 py-1 mb-2 rounded-xl items-center border shadow-sm transition-colors"
+            [ngClass]="item.isFreeItem
+              ? 'bg-amber-50 border-amber-200 cursor-not-allowed opacity-90'
+              : (cartService.selectedIndex() === i ? 'bg-orange-50 border-primary border-l-4 border-l-primary cursor-pointer' : 'bg-white border-slate-200 cursor-pointer')"
             (click)="selectItem(i)">
             <div class="col-span-7">
-              <p class="font-semibold text-slate-800">{{ item.name }}</p>
+              <p class="font-semibold text-slate-800">
+                {{ item.name }}
+                @if (item.isFreeItem) {
+                <span class="ml-1 text-amber-600 font-black" title="Free item">*</span>
+                }
+              </p>
               <p class="text-slate-500">&#64;{{ item.price | currencyIdr }}</p>
               <p class="text-slate-500">{{ item.promotionName }}</p>
             </div>
