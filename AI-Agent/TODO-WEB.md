@@ -113,6 +113,8 @@
 - [x] `payment.component.html` — 2-panel layout: kiri keypad + payment selector modal trigger, kanan paid entries table + summary
 - [x] `payment.component.css` — host styling
 - [x] Payment type selector upgraded to popup modal (scalable untuk banyak metode) + active method badge
+- [x] Voucher payment UI: `GET /api/voucher/:voucherCode` untuk validasi + `POST /api/voucher/use` untuk submit voucher dari layar payment
+- [x] Voucher submit sukses langsung menambah entry `VOUCHER` ke daftar pembayaran dari `kiosk_paid_pos` dengan `approvedCode = voucherCode`
 - **Source**: `stitch_pos_retail_supermaket/checkout_payment_selection/code.html`
 - **Route**: `/payment`
 - **Flow**: Cart → PAY button → `/payment` → `POST /api/payment/complete` → `/receipt`
@@ -122,6 +124,8 @@
   - `POST /api/payment/add` — add entry ke `kiosk_paid_pos`
   - `DELETE /api/payment/:id` — hapus entry dari `kiosk_paid_pos`
   - `POST /api/payment/complete` — finalize ke `transaction`/`transaction_detail`/`transaction_payment`
+  - `GET /api/voucher/:voucherCode` — validasi voucher sebelum dipakai
+  - `POST /api/voucher/use` — pakai voucher, update backend, log ke `voucher_log`, lalu insert payment voucher ke `kiosk_paid_pos`
 
 ### 2.6 Receipt (Struk)
 - [x] `receipt.component.ts` — preview struk, print, new transaction
@@ -193,6 +197,8 @@
 - [x] Socket.IO customer display → server relays display:update to terminal room
 - [x] Payment live refresh emit → add/remove/load pending/complete mengirim socket trigger ke customer display
 - [x] Payment page hardening → `socketService.connect()` dipastikan aktif saat route `/payment` dibuka langsung/refresh
+- [x] Voucher API integration → payment page validate voucher (`GET /api/voucher/:voucherCode`) dan submit voucher (`POST /api/voucher/use`)
+- [x] Voucher payment sync → submit voucher sukses langsung refresh paid entries dari response backend (`kiosk_paid_pos`)
 
 ## Phase 4: Final
 - [x] Full build clean (`ng build --configuration=production`)
@@ -217,9 +223,9 @@
 ---
 
 ## Last Updated
-- **Date**: 2026-04-08
-- **Last Completed Step**: Revamp Settings submenu ke Payment Type, penambahan list page (field penting) + detail page (semua field `payment_type`), serta wiring API detail/update.
-- **Next Step**: Lanjut E2E test alur utama + hardening UX error state pada flow print/network dan validasi end-to-end edit payment type.
+- **Date**: 2026-04-09
+- **Last Completed Step**: Voucher flow di payment page selesai: validasi voucher via `GET /api/voucher/:voucherCode`, submit voucher via `POST /api/voucher/use`, dan payment voucher otomatis masuk ke daftar pembayaran dari `kiosk_paid_pos`.
+- **Next Step**: Lanjut E2E test alur voucher sampai complete payment + hardening UX agar voucher yang sudah submit tidak bisa dikirim ulang dari UI.
 
 ### Route Summary
 | Route | Component | Guard |

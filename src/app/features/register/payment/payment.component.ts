@@ -28,6 +28,28 @@ export interface PaidEntry {
   paymentLabel: string;
   paymentName: string;
   paid: number;
+  approvedCode: string;
+}
+
+export interface VoucherValidationResult {
+  valid: boolean;
+  reason: string | null;
+  voucherCode: string;
+  transactionId: string;
+  voucherMinAmount: number;
+  voucherAllowMultyple: number;
+  voucherGiftAmount: number;
+  voucherExpDate: string | null;
+  status: number;
+  presence: number;
+  inputDate: string | null;
+  inputBy: string | null;
+}
+
+export interface VoucherSubmitResult {
+  voucher: VoucherValidationResult;
+  payments: PaidEntry[];
+  totalPaid: number;
 }
 
 @Component({
@@ -51,6 +73,14 @@ export class PaymentComponent implements OnInit {
 
   // Entry amount keypad
   entryAmount = signal('0');
+
+  // Voucher validation (shown only for VOUCHER payment type)
+  voucherIdInput = signal('');
+  voucherValidationMessage = signal('');
+  voucherValid = signal(false);
+  voucherAmount = signal(0);
+  voucherValidationLoading = signal(false);
+  voucherSubmitLoading = signal(false);
 
   // Paid entries table
   paidEntries = signal<PaidEntry[]>([]);
@@ -146,7 +176,107 @@ export class PaymentComponent implements OnInit {
     // Pre-fill remaining amount when selecting a payment type
     const remaining = this.remaining();
     this.entryAmount.set(remaining > 0 ? String(remaining) : '0');
+    this.voucherIdInput.set('');
+    this.voucherValidationMessage.set('');
+    this.voucherValid.set(false);
+    this.voucherAmount.set(0);
     this.isPaymentTypeModalOpen.set(false);
+  }
+
+  onVoucherInputChange(value: string): void {
+    this.voucherIdInput.set(String(value || '').toUpperCase());
+    this.voucherValid.set(false);
+    this.voucherAmount.set(0);
+    this.voucherValidationMessage.set('');
+  }
+
+  validateVoucherId(): void {
+    const rawCode = this.voucherIdInput().trim().toUpperCase();
+    this.voucherIdInput.set(rawCode);
+
+    if (!rawCode) {
+      this.voucherValid.set(false);
+      this.voucherValidationMessage.set('Voucher ID wajib diisi');
+      return;
+    }
+
+    this.voucherValidationLoading.set(true);
+    this.http
+      .get<ApiResponse<VoucherValidationResult>>(
+        `${environment.apiUrl}/voucher/${encodeURIComponent(rawCode)}`,
+      )
+      .subscribe({
+        next: (res) => {
+          this.voucherValidationLoading.set(false);
+
+          if (!res.success || !res.data) {
+            this.voucherValid.set(false);
+            this.voucherAmount.set(0);
+            this.voucherValidationMessage.set(res.message || 'Voucher tidak valid');
+            return;
+          }
+
+          this.voucherValid.set(res.data.valid);
+          this.voucherAmount.set(Number(res.data.voucherGiftAmount || 0));
+          this.entryAmount.set(String(Number(res.data.voucherGiftAmount || 0)));
+          this.voucherValidationMessage.set(
+            res.data.valid
+              ? `Voucher valid. Nominal ${Number(res.data.voucherGiftAmount || 0).toLocaleString('id-ID')}`
+              : (res.data.reason || 'Voucher tidak valid'),
+          );
+        },
+        error: (err) => {
+          this.voucherValidationLoading.set(false);
+          this.voucherValid.set(false);
+          this.voucherAmount.set(0);
+          this.voucherValidationMessage.set(err?.error?.message || 'Gagal validasi voucher');
+        },
+      });
+  }
+
+  submitVoucher(): void {
+    const kioskUuid = this.cartService.kioskUuid();
+    const voucherCode = this.voucherIdInput().trim().toUpperCase();
+
+    if (!kioskUuid) return;
+    if (!voucherCode) {
+      this.voucherValidationMessage.set('Voucher ID wajib diisi');
+      return;
+    }
+    if (!this.voucherValid()) {
+      this.voucherValidationMessage.set('Validasi voucher dulu sebelum submit');
+      return;
+    }
+
+    this.voucherSubmitLoading.set(true);
+    this.http
+      .post<ApiResponse<VoucherSubmitResult>>(`${environment.apiUrl}/voucher/use`, {
+        kioskUuid,
+        voucherCode,
+      })
+      .subscribe({
+        next: (res) => {
+          this.voucherSubmitLoading.set(false);
+
+          if (!res.success || !res.data) {
+            this.voucherValidationMessage.set(res.message || 'Submit voucher gagal');
+            return;
+          }
+
+          this.paidEntries.set(res.data.payments);
+          this.totalPaid.set(res.data.totalPaid);
+          this.voucherValid.set(false);
+          this.voucherAmount.set(0);
+          this.entryAmount.set('0');
+          this.voucherIdInput.set('');
+          this.voucherValidationMessage.set(`Voucher ${voucherCode} berhasil dipakai`);
+          this.emitDisplayReload();
+        },
+        error: (err) => {
+          this.voucherSubmitLoading.set(false);
+          this.voucherValidationMessage.set(err?.error?.message || 'Submit voucher gagal');
+        },
+      });
   }
 
   openPaymentTypeModal(): void {
@@ -318,6 +448,7 @@ export class PaymentComponent implements OnInit {
 
   paymentTypeIcon(id: string): string {
     if (id === 'CASH') return 'payments';
+    if (id === 'VOUCHER') return 'redeem';
     if (id.includes('QRIS')) return 'qr_code_2';
     return 'credit_card';
   }
