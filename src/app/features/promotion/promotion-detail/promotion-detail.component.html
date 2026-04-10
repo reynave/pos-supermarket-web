@@ -1,0 +1,165 @@
+<div class="min-h-screen bg-background-light flex flex-col">
+    <app-header [title]="'Promotion Detail'" [userName]="userName"></app-header>
+
+    <main class="flex flex-1 flex-col px-4 py-3 lg:px-10 max-w-[1280px] mx-auto w-full gap-6">
+        <section class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex items-center gap-3">
+
+                <div>
+                    <h1 class="text-2xl tracking-tight text-slate-900">Promotion Detail</h1>
+                    <p class="text-sm text-slate-500">View promotion data and switch to edit mode when needed.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2" *ngIf="!loading() && promotion() as promo">
+                <button *ngIf="!isEditing()" type="button" (click)="enableEdit()"
+                    class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-slate-700">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    Edit
+                </button>
+
+                <button *ngIf="isEditing()" type="button" (click)="cancelEdit()"
+                    class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
+                    Cancel
+                </button>
+
+                <button *ngIf="isEditing()" type="button" (click)="saveUpdate()" [disabled]="saving()"
+                    class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white transition hover:opacity-95 disabled:opacity-50">
+                    <span class="material-symbols-outlined text-[18px]">save</span>
+                    {{ saving() ? 'Saving...' : 'Save' }}
+                </button>
+            </div>
+        </section>
+
+        <section *ngIf="errorMessage()"
+            class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-sm">
+            {{ errorMessage() }}
+        </section>
+
+        <section *ngIf="loading()"
+            class="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center text-slate-400 shadow-sm">
+            <span class="material-symbols-outlined mb-4 block animate-pulse text-5xl">local_offer</span>
+            Loading promotion...
+        </section>
+
+        <section *ngIf="!loading() && promotion() as promo"
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div
+                class="flex flex-col gap-2 border-b border-slate-200 bg-slate-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h2 class="text-lg font-black tracking-tight text-slate-900">Promotion Information</h2>
+                    <p class="text-sm text-slate-500">Readonly by default. Click Edit to enable input fields.</p>
+                </div>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold"
+                    [ngClass]="isEditing() ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'">
+                    {{ isEditing() ? 'EDIT MODE' : 'VIEW MODE' }}
+                </span>
+            </div>
+
+            <div class="grid gap-6 px-6 py-6 lg:grid-cols-2">
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Promotion
+                        ID</label>
+                    <input [ngModel]="promo.id" readonly
+                        class="h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Type of
+                        Promotion</label>
+                    <input [ngModel]="promo.typeOfPromotion" readonly
+                        class="h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Code</label>
+                    <input [(ngModel)]="promo.code" [readonly]="!isEditing()"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700'" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Description
+                        *</label>
+                    <input [(ngModel)]="promo.description" [readonly]="!isEditing()"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700'" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Start Date
+                        *</label>
+                    <input [(ngModel)]="promo.startDate" [readonly]="!isEditing()" [disabled]="!isEditing()"
+                        type="datetime-local"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700 disabled:opacity-100'" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">End Date
+                        *</label>
+                    <input [(ngModel)]="promo.endDate" [readonly]="!isEditing()" [disabled]="!isEditing()"
+                        type="datetime-local"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700 disabled:opacity-100'" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Discount
+                        Percent (%)</label>
+                    <input [(ngModel)]="promo.discountPercent" [readonly]="!isEditing()" type="number" step="0.01"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700'" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Discount
+                        Amount (IDR)</label>
+                    <input [(ngModel)]="promo.discountAmount" [readonly]="!isEditing()" type="number" step="1"
+                        [class]="isEditing() ? 'h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20' : 'h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700'" />
+                </div>
+            </div>
+
+            <div class="border-t border-slate-200 px-6 py-6">
+                <label class="mb-3 block text-xs font-semibold uppercase tracking-wider text-slate-500">Active
+                    Days</label>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                    <button type="button" (click)="toggleDay('Mon')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Mon') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Mon</button>
+                    <button type="button" (click)="toggleDay('Tue')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Tue') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Tue</button>
+                    <button type="button" (click)="toggleDay('Wed')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Wed') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Wed</button>
+                    <button type="button" (click)="toggleDay('Thu')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Thu') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Thu</button>
+                    <button type="button" (click)="toggleDay('Fri')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Fri') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Fri</button>
+                    <button type="button" (click)="toggleDay('Sat')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Sat') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Sat</button>
+                    <button type="button" (click)="toggleDay('Sun')" [disabled]="!isEditing()"
+                        [class]="isDaySelected('Sun') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold disabled:opacity-70' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold disabled:opacity-70'">Sun</button>
+                </div>
+            </div> 
+        </section>
+    </main>
+
+    <div class="flex flex-1 flex-col px-4 py-3 lg:px-10 max-w-[1280px] mx-auto w-full gap-6">
+
+        <section *ngIf="!loading() && promotion() as promo"
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+               
+            <div class="border-t border-slate-200 px-6 py-6">
+                <label class="mb-3 block text-lg font-semibold uppercase tracking-wider text-slate-500">Detail Items</label>
+
+                <app-promotion-free-detail *ngIf="promo.typeOfPromotion === 'promotion_free'"
+                    [promotionIdInput]="promo.id || null" [embeddedMode]="true"></app-promotion-free-detail>
+
+                <app-promotion-item-detail *ngIf="promo.typeOfPromotion === 'promotion_item'"
+                    [promotionIdInput]="promo.id || null" [embeddedMode]="true"></app-promotion-item-detail>
+
+                <div *ngIf="promo.typeOfPromotion !== 'promotion_free' && promo.typeOfPromotion !== 'promotion_item'"
+                    class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500">
+                    Detail table belum tersedia untuk tipe <span class="font-semibold text-slate-700">{{
+                        promo.typeOfPromotion }}</span>.
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>

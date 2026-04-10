@@ -232,13 +232,20 @@
 [x] form/detail Items disesuaikan dengan struktur `item` + multi-barcode `item_barcode`
 
 ### 7. Screen Promotion
-[ ] view table promotion
+[x] UI module Promotion/Discount dibuat dengan route baru (`/promotions`, `/promotions/new`, `/promotions/:id`) dan entry dari Settings submenu.
+[x] Promotion list default menampilkan semua data aktif (`presence = 1`) tanpa wajib search.
+[x] Search promotion by `code` dan `description`.
+[x] Create promotion auto-generate ID dari backend dan auto-redirect ke halaman detail manage.
+[x] Promotion detail dijadikan 1 halaman untuk view + edit (tanpa child route detail lama).
+[x] Detail `promotion_free` dan `promotion_item` ditampilkan inline di halaman detail promotion.
+[x] Design list/form/detail promotion dirapikan agar konsisten dengan module Items.
+[x] Header dibuat fixed top dan semua tombol Back/goBack di flow promotion memakai `history.back()`.
 ---
 
 ## Last Updated
-- **Date**: 2026-04-09
-- **Last Completed Step**: Voucher flow di payment page selesai: validasi voucher via `GET /api/voucher/:voucherCode`, submit voucher via `POST /api/voucher/use`, dan payment voucher otomatis masuk ke daftar pembayaran dari `kiosk_paid_pos`.
-- **Next Step**: Lanjut E2E test alur voucher sampai complete payment + hardening UX agar voucher yang sudah submit tidak bisa dikirim ulang dari UI.
+- **Date**: 2026-04-10
+- **Last Completed Step**: Module Promotion selesai end-to-end (backend + frontend), termasuk perbaikan payload endpoint detail/free/item, refactor detail page (view+edit), dan standardisasi back navigation ke `history.back()`.
+- **Next Step**: Lanjut E2E test untuk alur Promotion (create -> manage detail -> edit -> delete) dan regresi flow payment/report.
 
 ### Route Summary
 | Route | Component | Guard |
@@ -252,6 +259,9 @@
 | `/settings/payment-type/:id` | PaymentTypeDetailComponent | authGuard |
 | `/settings/erc-qr` | Redirect -> `/settings/payment-type` | — |
 | `/settings/printer-setup` | PrinterSetupComponent | authGuard |
+| `/promotions` | PromotionListComponent | authGuard |
+| `/promotions/new` | PromotionFormComponent | authGuard |
+| `/promotions/:id` | PromotionDetailComponent | authGuard |
 | `/daily-start` | DailyStartComponent | authGuard |
 | `/manual-cash-in` | ManualCashInComponent | authGuard + shiftGuard |
 | `/cart` | CartComponent | authGuard + shiftGuard |

@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-header',
@@ -12,9 +11,7 @@ export class HeaderComponent {
   @Input() userName: string = '';
   @Input() showBackButton: boolean = true;
 
-  constructor(private location: Location) {}
-
   goBack(): void {
-    this.location.back();
+    history.back();
   }
 }

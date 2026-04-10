@@ -1,0 +1,227 @@
+<app-header *ngIf="!embeddedMode" [userName]="userName"></app-header>
+
+<div [ngClass]="embeddedMode ? 'space-y-4' : 'container mx-auto px-4 py-6'">
+  <!-- Back & Title -->
+  <div class="flex items-center justify-between mb-6" *ngIf="!embeddedMode">
+    <div class="flex items-center gap-4">
+      <button
+        (click)="goBack()"
+        class="text-2xl text-blue-600 hover:text-blue-800 transition"
+        title="Back"
+      >
+        ← Back
+      </button>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">
+          {{ promotion()?.description || 'Promotion' }}
+        </h1>
+        <p class="text-sm text-gray-600">Manage "Buy X Get Y Free" details</p>
+      </div>
+    </div>
+    <button
+      (click)="openForm()"
+      class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold"
+    >
+      + Add Free Item
+    </button>
+  </div>
+
+  <div class="flex items-center justify-between" *ngIf="embeddedMode">
+    <div>
+      <h3 class="text-base font-black tracking-tight text-slate-900">Promotion Free Detail</h3>
+      <p class="text-xs text-slate-500">Buy X Get Y configuration</p>
+    </div>
+    <button
+      (click)="openForm()"
+      class="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+    >
+      + Add Free Item
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="text-center py-8">
+    <p class="text-gray-500 text-lg">Loading free items...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && freeItems().length === 0" class="bg-white rounded-lg shadow p-8 text-center">
+    <p class="text-gray-500 text-lg">No free items configured yet.</p>
+    <p class="text-gray-400 text-sm mt-2">Create your first "Buy X Get Y Free" configuration above.</p>
+  </div>
+
+  <!-- Free Items Table -->
+  <div *ngIf="!loading() && freeItems().length > 0" class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="w-full border-collapse">
+      <thead class="bg-gray-100 border-b-2 border-gray-300">
+        <tr>
+          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Buy Item</th>
+          <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Qty</th>
+          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Get Free Item</th>
+          <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Free Qty</th>
+          <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Flags</th>
+          <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of freeItems()" class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="font-semibold">{{ item.itemId }}</div>
+            <div class="text-xs text-gray-500">{{ item.itemDescription || '—' }}</div>
+          </td>
+          <td class="px-4 py-3 text-center text-sm font-semibold text-gray-700">{{ item.qty }}</td>
+          <td class="px-4 py-3 text-sm text-gray-700">
+            <div class="font-semibold">{{ item.freeItemId }}</div>
+            <div class="text-xs text-gray-500">{{ item.freeItemDescription || '—' }}</div>
+          </td>
+          <td class="px-4 py-3 text-center text-sm font-semibold text-gray-700">{{ item.freeQty }}</td>
+          <td class="px-4 py-3 text-center text-xs text-gray-600">
+            <div *ngIf="item.applyMultiply === 1" class="px-2 py-1 bg-blue-100 text-blue-700 rounded inline-block mb-1">
+              Stack
+            </div>
+            <div *ngIf="item.scanFree === 1" class="px-2 py-1 bg-purple-100 text-purple-700 rounded inline-block mb-1">
+              Scan Free
+            </div>
+            <div
+              *ngIf="item.printOnBill === 1"
+              class="px-2 py-1 bg-orange-100 text-orange-700 rounded inline-block"
+            >
+              Print Bill
+            </div>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <div class="flex gap-2 justify-center">
+              <button
+                (click)="openForm(item)"
+                class="px-3 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600 transition"
+              >
+                Edit
+              </button>
+              <button
+                (click)="deleteItem(item)"
+                [disabled]="deletingIds().has(item.id!)"
+                class="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition disabled:opacity-50"
+              >
+                {{ deletingIds().has(item.id!) ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Form Modal -->
+  <div *ngIf="showForm()" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold text-gray-800 mb-4">
+        {{ editingId() ? 'Edit Free Item' : 'Add Free Item Configuration' }}
+      </h2>
+
+      <form (ngSubmit)="submitForm()" class="space-y-4">
+        <!-- Buy Item ID -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Buy Item ID *</label>
+          <input
+            [(ngModel)]="formData().itemId"
+            name="itemId"
+            type="text"
+            placeholder="e.g., 899123456701"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+            required
+          />
+        </div>
+
+        <!-- Buy Quantity -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Quantity to Buy *</label>
+          <input
+            [(ngModel)]="formData().qty"
+            name="qty"
+            type="number"
+            min="1"
+            placeholder="e.g., 2"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+            required
+          />
+        </div>
+
+        <!-- Free Item ID -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Free Item ID *</label>
+          <input
+            [(ngModel)]="formData().freeItemId"
+            name="freeItemId"
+            type="text"
+            placeholder="e.g., 899123456702"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+            required
+          />
+        </div>
+
+        <!-- Free Quantity -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Free Quantity *</label>
+          <input
+            [(ngModel)]="formData().freeQty"
+            name="freeQty"
+            type="number"
+            min="1"
+            placeholder="e.g., 1"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+            required
+          />
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="space-y-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="formData().applyMultiply === 1"
+              (change)="toggleCheckbox('applyMultiply')"
+              class="w-4 h-4 rounded"
+            />
+            <span class="text-sm text-gray-700">Apply Multiply (Stack promotions)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="formData().scanFree === 1"
+              (change)="toggleCheckbox('scanFree')"
+              class="w-4 h-4 rounded"
+            />
+            <span class="text-sm text-gray-700">Scan Free (Manual scan required)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="formData().printOnBill === 1"
+              (change)="toggleCheckbox('printOnBill')"
+              class="w-4 h-4 rounded"
+            />
+            <span class="text-sm text-gray-700">Print on Bill</span>
+          </label>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2 justify-end pt-4">
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500 transition text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition text-sm"
+          >
+            {{ saving() ? 'Saving...' : 'Save' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

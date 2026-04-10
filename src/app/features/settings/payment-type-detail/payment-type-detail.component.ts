@@ -264,6 +264,6 @@ export class PaymentTypeDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/settings/payment-type']);
+    history.back();
   }
 }

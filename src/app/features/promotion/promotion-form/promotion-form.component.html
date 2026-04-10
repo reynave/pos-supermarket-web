@@ -1,0 +1,176 @@
+<div class="min-h-screen bg-background-light flex flex-col">
+  <app-header [title]="isEdit() ? 'Edit Promotion' : 'Create Promotion'" [userName]="userName"></app-header>
+
+  <main class="flex flex-1 flex-col px-4 py-3 lg:px-10 max-w-[1280px] mx-auto w-full gap-6">
+    
+    <section *ngIf="errorMessage()" class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-sm">
+      {{ errorMessage() }}
+    </section>
+
+    <section *ngIf="loading()" class="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center text-slate-400 shadow-sm">
+      <span class="material-symbols-outlined mb-4 block animate-pulse text-5xl">local_offer</span>
+      Loading promotion...
+    </section>
+
+    <section *ngIf="!loading()" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm max-w-4xl mx-auto w-full">
+      <div class="border-b border-slate-200 bg-slate-50 px-6 py-4">
+      <div>
+          <h1 class="text-2xl tracking-tight text-slate-900">{{ isEdit() ? 'Edit Promotion' : 'Create New Promotion' }}</h1>
+          
+        </div>
+        <p class="text-sm text-slate-500">Fill required fields marked with *.</p>
+      </div>
+
+      <form (ngSubmit)="submit()" class="space-y-6 px-6 py-6">
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Type of Promotion *</label>
+            <select
+              [(ngModel)]="promotion().typeOfPromotion"
+              name="typeOfPromotion"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20 disabled:bg-slate-100"
+              [disabled]="isEdit()"
+            >
+            
+              <option value="promotion_item">promotion_item</option>
+              <option value="promotion_free">promotion_free</option>
+              <!-- <option value="promotion_discount">promotion_discount</option> -->
+              <option value="voucher">voucher</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Code</label>
+            <input
+              [(ngModel)]="promotion().code"
+              name="code"
+              type="text"
+              placeholder="Auto-generated"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-slate-100 px-4 text-sm text-slate-700"
+              [disabled]="true"
+            />
+          </div>
+
+          <div class="lg:col-span-2">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Description *</label>
+            <input
+              [(ngModel)]="promotion().description"
+              name="description"
+              type="text"
+              placeholder="e.g., Buy 2 Get 1 Free"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Start Date *</label>
+            <input
+              [(ngModel)]="promotion().startDate"
+              name="startDate"
+              type="datetime-local"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">End Date *</label>
+            <input
+              [(ngModel)]="promotion().endDate"
+              name="endDate"
+              type="datetime-local"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Global Discount Percent (%)</label>
+            <input
+              [(ngModel)]="promotion().discountPercent"
+              name="discountPercent"
+              type="number"
+              step="0.01"
+              placeholder="0"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Global Discount Amount (IDR)</label>
+            <input
+              [(ngModel)]="promotion().discountAmount"
+              name="discountAmount"
+              type="number"
+              step="1"
+              placeholder="0"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-6">
+          <label class="mb-3 block text-xs font-semibold uppercase tracking-wider text-slate-500">Active Days</label>
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+            <button
+              type="button"
+              (click)="toggleDay('Mon')"
+              [class]="isDaySelected('Mon') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Mon</button>
+            <button
+              type="button"
+              (click)="toggleDay('Tue')"
+              [class]="isDaySelected('Tue') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Tue</button>
+            <button
+              type="button"
+              (click)="toggleDay('Wed')"
+              [class]="isDaySelected('Wed') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Wed</button>
+            <button
+              type="button"
+              (click)="toggleDay('Thu')"
+              [class]="isDaySelected('Thu') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Thu</button>
+            <button
+              type="button"
+              (click)="toggleDay('Fri')"
+              [class]="isDaySelected('Fri') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Fri</button>
+            <button
+              type="button"
+              (click)="toggleDay('Sat')"
+              [class]="isDaySelected('Sat') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Sat</button>
+            <button
+              type="button"
+              (click)="toggleDay('Sun')"
+              [class]="isDaySelected('Sun') ? 'h-10 rounded-xl bg-primary text-white text-sm font-bold' : 'h-10 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold'"
+            >Sun</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-6">
+          <button
+            type="button"
+            (click)="goBack()"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+          >
+            <span class="material-symbols-outlined text-[18px]">close</span>
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white transition hover:opacity-95 disabled:opacity-50"
+          >
+            <span class="material-symbols-outlined text-[18px]">save</span>
+            {{ saving() ? 'Saving...' : isEdit() ? 'Update' : 'Create & Continue' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,176 @@
+<div class="min-h-screen bg-background-light flex flex-col">
+  <app-header [title]="'Promotions'" [userName]="userName"></app-header>
+
+  <main class="flex flex-1 flex-col px-4 py-8 lg:px-10 max-w-[1280px] mx-auto w-full gap-6">
+    <section class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h1 class="text-2xl tracking-tight text-slate-900">Promotion Master</h1>
+        <p class="mt-2 max-w-2xl text-base text-slate-500">
+          Kelola seluruh konfigurasi promotion & discount. Search berdasarkan code atau description.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="openCreate()"
+        class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-95"
+      >
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        New Promotion
+      </button>
+    </section>
+
+    <section *ngIf="errorMessage()" class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-sm">
+      {{ errorMessage() }}
+    </section>
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+      <div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <label for="promotionSearch" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Search Promotions
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input
+              id="promotionSearch"
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="submitSearch()"
+              type="text"
+              placeholder="Search by code / description"
+              appAutoFocus
+              class="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="button"
+            (click)="submitSearch()"
+            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-700"
+          >
+            <span class="material-symbols-outlined text-[20px]">manage_search</span>
+            Search
+          </button>
+
+          <button
+            type="button"
+            (click)="clearSearch()"
+            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+          >
+            <span class="material-symbols-outlined text-[20px]">close</span>
+            Clear
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-lg font-black tracking-tight text-slate-900">Promotion Table</h2>
+          <p class="text-sm text-slate-500">
+            Menampilkan <span class="font-bold text-slate-900">{{ totalPromotions() }}</span> data promotion aktif.
+          </p>
+        </div>
+        <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+          Query Param: q={{ searchTerm() }}
+        </div>
+      </div>
+
+      <div *ngIf="loading()" class="px-6 py-16 text-center text-slate-400">
+        <span class="material-symbols-outlined mb-4 block animate-pulse text-5xl">local_offer</span>
+        Loading promotions...
+      </div>
+
+      <div *ngIf="!loading() && filteredPromotions().length === 0" class="px-6 py-16 text-center text-slate-400">
+        <span class="material-symbols-outlined mb-4 block text-5xl">inventory</span>
+        No promotions matched this search.
+      </div>
+
+      <div *ngIf="!loading() && filteredPromotions().length > 0" class="overflow-x-auto">
+        <table class="w-full min-w-[980px] text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 bg-white text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <th class="px-6 py-4">Promotion ID</th>
+              <th class="px-6 py-4">Description</th>
+              <th class="px-6 py-4">Type</th>
+              <th class="px-6 py-4">Start Date</th>
+              <th class="px-6 py-4">Valid Until</th>
+              <th class="px-6 py-4 text-center">Status</th>
+              <th class="px-6 py-4 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let promo of filteredPromotions()" class="transition hover:bg-slate-50/80">
+              <td class="px-6 py-5 font-bold text-slate-900">{{ promo.id }}</td>
+              <td class="px-6 py-5">
+                <div class="font-semibold text-slate-900">{{ promo.description }}</div>
+                <div class="mt-1 text-xs text-slate-500">Code: {{ promo.code || '-' }}</div>
+              </td>
+              <td class="px-6 py-5">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" [ngClass]="getTypeClass(promo.typeOfPromotion)">
+                  {{ promo.typeOfPromotion }}
+                </span>
+              </td>
+              <td class="px-6 py-5 text-slate-600">{{ promo.startDate | date : 'short' }}</td>
+              <td class="px-6 py-5 text-slate-600">{{ promo.endDate | date : 'short' }}</td>
+              <td class="px-6 py-5 text-center">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" [ngClass]="getStatusClass(promo)">
+                  {{ isActive(promo) ? 'ACTIVE' : 'INACTIVE' }}
+                </span>
+              </td>
+              <td class="px-6 py-5">
+                <div class="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    (click)="openDetail(promo)"
+                    class="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+                  >
+                    Detail
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deletePromotion(promo)"
+                    [disabled]="deletingIds().has(promo.id)"
+                    class="inline-flex h-9 items-center gap-2 rounded-lg border border-rose-200 px-3 text-xs font-bold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ deletingIds().has(promo.id) ? 'Deleting...' : 'Delete' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading() && filteredPromotions().length > 0" class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+        <div class="text-sm text-slate-600">
+          Page <span class="font-bold">{{ currentPage() }}</span> of <span class="font-bold">{{ totalPages() }}</span>
+        </div>
+
+        <div class="flex gap-2">
+          <button
+            type="button"
+            (click)="previousPage()"
+            [disabled]="currentPage() === 1"
+            class="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="material-symbols-outlined text-base">chevron_left</span>
+            Previous
+          </button>
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage() >= totalPages()"
+            class="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+            <span class="material-symbols-outlined text-base">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

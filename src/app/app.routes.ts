@@ -85,6 +85,40 @@ export const routes: Routes = [
       import('./features/items/item-detail/item-detail.component').then((m) => m.ItemDetailComponent),
   },
   {
+    path: 'promotions',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/promotion/promotion-list/promotion-list.component').then((m) => m.PromotionListComponent),
+  },
+  {
+    path: 'promotions/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/promotion/promotion-form/promotion-form.component').then((m) => m.PromotionFormComponent),
+  },
+  {
+    path: 'promotions/:promotionId/free',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/promotion/promotion-free-detail/promotion-free-detail.component').then(
+        (m) => m.PromotionFreeDetailComponent
+      ),
+  },
+  {
+    path: 'promotions/:promotionId/item',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/promotion/promotion-item-detail/promotion-item-detail.component').then(
+        (m) => m.PromotionItemDetailComponent
+      ),
+  },
+  {
+    path: 'promotions/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/promotion/promotion-detail/promotion-detail.component').then((m) => m.PromotionDetailComponent),
+  },
+  {
     path: 'daily-start',
     canActivate: [authGuard],
     loadComponent: () =>
