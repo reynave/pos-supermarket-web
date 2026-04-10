@@ -1,0 +1,226 @@
+<div class="min-h-screen bg-background-light flex flex-col">
+  <app-header [title]="'Items'" [userName]="userName"></app-header>
+
+  <main class="flex flex-1 flex-col px-4 py-8 lg:px-10 max-w-[1280px] mx-auto w-full gap-6">
+    <section class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h1 class=" text-2xl  tracking-tight text-slate-900">Items Master</h1>
+        <p class="mt-2 max-w-2xl text-base text-slate-500">
+          Cari item berdasarkan barcode, item ID, atau nama. 
+          Table tetap kosong sampai pencarian dijalankan.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="openCreate()"
+        class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-95">
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        New Item
+      </button>
+    </section>
+
+    @if (errorMessage()) {
+      <section class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-sm">
+        {{ errorMessage() }}
+      </section>
+    }
+
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+      <div class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <label for="itemSearch" class="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Search Items
+          </label>
+          <div class="relative">
+            <span class="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input
+              id="itemSearch"
+              type="text"
+              [value]="searchTerm()"
+              (input)="onSearchInput($event)"
+              (keyup.enter)="submitSearch()"
+              placeholder="Search by barcode / item ID / name"
+              class="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="button"
+            (click)="submitSearch()"
+            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-700">
+            <span class="material-symbols-outlined text-[20px]">manage_search</span>
+            Search
+          </button>
+          <button
+            type="button"
+            (click)="clearSearch()"
+            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+            Clear
+          </button>
+        </div>
+      </div>
+    </section>
+
+    @if (!hasSearched()) {
+      <section class="overflow-hidden rounded-2xl border border-dashed border-slate-300 bg-white shadow-sm">
+        <div class="grid gap-6 px-6 py-10 md:grid-cols-[1.4fr_0.8fr] md:px-8">
+          <div>
+            <h2 class="text-2xl font-black tracking-tight text-slate-900">Table akan muncul setelah search</h2>
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+              Halaman ini sengaja dimulai kosong supaya pola UX seragam dengan report screen. Gunakan satu keyword untuk mencari ID item, barcode, atau nama produk.
+            </p>
+          </div>
+
+          <div class="rounded-2xl bg-slate-50 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Quick Examples</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button type="button" (click)="searchTerm.set('ITEM-1001'); submitSearch()" class="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:ring-primary/40">ITEM-1001</button>
+              <button type="button" (click)="searchTerm.set('8991001000003'); submitSearch()" class="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:ring-primary/40">8991001000003</button>
+              <button type="button" (click)="searchTerm.set('Susu'); submitSearch()" class="rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:ring-primary/40">Susu</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    } @else {
+      <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 class="text-lg font-black tracking-tight text-slate-900">Search Result</h2>
+            <p class="text-sm text-slate-500">
+              Keyword <span class="font-bold text-slate-900">{{ searchTerm() }}</span> menemukan <span class="font-bold text-slate-900">{{ totalItems() }}</span> item.
+            </p>
+          </div>
+          <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Query Param: q={{ searchTerm() }}
+          </div>
+        </div>
+
+        @if (loading()) {
+          <div class="px-6 py-16 text-center text-slate-400">
+            <span class="material-symbols-outlined mb-4 block animate-pulse text-5xl">inventory_2</span>
+            Loading items...
+          </div>
+        } @else if (filteredItems().length === 0) {
+          <div class="px-6 py-16 text-center text-slate-400">
+            <span class="material-symbols-outlined mb-4 block text-5xl">inventory</span>
+            No items matched this search.
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[980px] text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-200 bg-white text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <th class="px-6 py-4">Item ID</th> 
+                  <th class="px-6 py-4">Item Name</th>
+                  <th class="px-6 py-4">Category</th>
+                  <th class="px-6 py-4 text-right">Price</th>
+                  <th class="px-6 py-4 text-center">Barcode</th>
+                  <th class="px-6 py-4 text-center">Status</th>
+                  <th class="px-6 py-4 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                @for (item of filteredItems(); track item.id) {
+                  <tr class="transition hover:bg-slate-50/80">
+                    <td class="px-6 py-5 font-bold text-slate-900">{{ item.id }}</td>
+                
+                    <td class="px-6 py-5">
+                      <div class="font-semibold text-slate-900">{{ item.description }}</div>
+                      <div class="mt-1 text-xs text-slate-500">{{ item.shortDesc || 'No short description' }}</div>
+                    </td>
+                    <td class="px-6 py-5 text-slate-600">
+                      <div>{{ item.itemCategoryName || '-' }}</div>
+                      <div class="mt-1 text-xs text-slate-400">{{ item.itemUomName || item.itemUomId || '-' }}</div>
+                    </td>
+                    <td class="px-6 py-5 text-right font-bold text-slate-900">{{ item.price1 | currencyIdr }}</td>
+                    <td class="px-6 py-5 text-center text-slate-600">{{ item.barcodeCount }}</td>
+                    <td class="px-6 py-5 text-center">
+                      <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold" [ngClass]="getStatusClass(item.status)">
+                        {{ item.status === 1 ? 'ACTIVE' : 'INACTIVE' }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-5">
+                      <div class="flex items-center justify-center gap-2">
+                        <button 
+                          type="button" 
+                          (click)="openDetail(item)" 
+                          [disabled]="isDeleting(item.id)"
+                          class="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:border-primary/50 hover:bg-primary/5 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                          Detail
+                        </button>
+                        <button 
+                          type="button" 
+                          (click)="openEdit(item)" 
+                          [disabled]="isDeleting(item.id)"
+                          class="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:border-slate-700 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                          Edit
+                        </button>
+                        <button 
+                          type="button" 
+                          (click)="deleteItem(item)" 
+                          [disabled]="isDeleting(item.id)"
+                          class="inline-flex h-9 items-center gap-2 rounded-lg border border-rose-200 px-3 text-xs font-bold text-rose-600 transition hover:bg-rose-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                          @if (isDeleting(item.id)) {
+                            <span class="material-symbols-outlined text-base animate-spin">hourglass_empty</span>
+                          } @else {
+                            Delete
+                          }
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+            <div class="text-sm text-slate-600">
+              @if (totalPages() > 1) {
+                Page <span class="font-bold">{{ currentPage() }}</span> of <span class="font-bold">{{ totalPages() }}</span>
+              } @else if (totalItems() > 0) {
+                <span class="font-bold">{{ totalItems() }}</span> item<span class="hidden/{{ totalItems() === 1 ? 'hidden' : '' }}">s</span> found
+              }
+            </div>
+
+            @if (totalPages() > 1) {
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  (click)="previousPage()"
+                  [disabled]="currentPage() <= 1 || loading()"
+                  class="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span class="material-symbols-outlined text-base">chevron_left</span>
+                  Previous
+                </button>
+
+                @for (page of getPageNumbers(); track page) {
+                  <button
+                    type="button"
+                    (click)="goToPage(page)"
+                    [disabled]="loading()"
+                    [ngClass]="currentPage() === page ? 'bg-primary text-white border-primary' : 'border-slate-300 text-slate-700 hover:bg-slate-100'"
+                    class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border px-2 text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    {{ page }}
+                  </button>
+                }
+
+                <button
+                  type="button"
+                  (click)="nextPage()"
+                  [disabled]="currentPage() >= totalPages() || loading()"
+                  class="inline-flex h-9 items-center gap-1 rounded-lg border border-slate-300 px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                  Next
+                  <span class="material-symbols-outlined text-base">chevron_right</span>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>

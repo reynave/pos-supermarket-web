@@ -61,6 +61,30 @@ export const routes: Routes = [
       import('./features/settings/printer-setup/printer-setup.component').then((m) => m.PrinterSetupComponent),
   },
   {
+    path: 'items',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/items/items-list/items-list.component').then((m) => m.ItemsListComponent),
+  },
+  {
+    path: 'items/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/items/item-form/item-form.component').then((m) => m.ItemFormComponent),
+  },
+  {
+    path: 'items/:id/edit',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/items/item-form/item-form.component').then((m) => m.ItemFormComponent),
+  },
+  {
+    path: 'items/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/items/item-detail/item-detail.component').then((m) => m.ItemDetailComponent),
+  },
+  {
     path: 'daily-start',
     canActivate: [authGuard],
     loadComponent: () =>

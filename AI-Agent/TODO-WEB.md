@@ -220,6 +220,19 @@
 - [ ] Accessibility pass untuk touch POS (focus order, keyboard scanner flow, kontras teks, target sentuh >=48px).
 - [ ] Smoke test CI untuk build + lint + test minimal agar regresi cepat ketahuan.
 
+
+--- tambahan
+
+### 6. Screen Items  
+
+[x] UI CRUD module `Items` dibuat dengan route baru (`/items`, `/items/new`, `/items/:id`, `/items/:id/edit`) dan entry dari Settings submenu.
+[x] table awal kosong , hanya ada search items by barcode / id / name , setelah di search dan ketemu baru tampilan isi dalam bentuk table, screen halaman tersebut bisa dengan konsep UI "Daily Sales Report" (http://localhost:4200/report), supaya seragam, hasil search bisa di taruh di query params, jika di reload tidak hilang 
+[x] jika setelah diklik masuk ke halaman detail, jika diback kembali ke halaman table item tadi, tapi dengan url yang sudah ada query params search tersebut
+[x] sambungkan Items module ke API/backend CRUD asli (list/search/detail/create/update/delete)
+[x] form/detail Items disesuaikan dengan struktur `item` + multi-barcode `item_barcode`
+
+### 7. Screen Promotion
+[ ] view table promotion
 ---
 
 ## Last Updated

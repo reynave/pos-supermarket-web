@@ -19,8 +19,8 @@
     </div>
   </header>
 
-  <main class="flex-1 max-w-5xl w-full mx-auto p-6 md:p-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <main class="flex-1 max-w-6xl w-full mx-auto p-6 md:p-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <a
         routerLink="/settings/payment-type"
         class="group bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
@@ -39,6 +39,16 @@
         </div>
         <h2 class="text-xl font-bold text-slate-900 mb-2">Setup Printer</h2>
         <p class="text-slate-500 text-sm">Configure receipt printer and test print connection.</p>
+      </a>
+
+      <a
+        routerLink="/items"
+        class="group bg-white p-8 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-primary/50 hover:-translate-y-1">
+        <div class="size-20 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-4xl">inventory_2</span>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Items</h2>
+        <p class="text-slate-500 text-sm">Browse the item list UI, review detail page, and preview local CRUD form flow.</p>
       </a>
     </div>
 
