@@ -26,6 +26,9 @@
               <span class="material-symbols-outlined text-lg">{{ paymentTypeIcon(selectedTypeId()) }}</span>
               <span class="truncate"> {{ selectedTypeLabel() }} </span>
             </div>
+            <p class="mt-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Connection Type: <span class="text-slate-700">{{ selectedConnectionType() }}</span>
+            </p>
           </div>
 
           <button
@@ -93,8 +96,7 @@
         <span class="text-4xl font-black font-mono text-slate-900">{{ +entryAmount() | currencyIdr }}</span>
       </div>
 
-
-      @if( selectedTypeId() == 'CASH' || selectedTypeId() == 'DEBITCC' ) {
+      @if( selectedTypeId() != 'VOUCHER'  ) {
       <div class="grid grid-cols-12 gap-4">
         <div class="col-span-9 h-auto ">
           <!-- Keypad -->
@@ -149,7 +151,7 @@
             </svg>
             }
             <span class="material-symbols-outlined">add_circle</span>
-            <span>Add Payment</span>
+            <span>Add Payment</span> 
           </button>
           }
         </div>

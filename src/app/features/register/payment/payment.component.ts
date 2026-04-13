@@ -15,11 +15,24 @@ import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
 export interface PaymentType {
   id: string;
+  openCashDrawer: number;
+  edc: number;
   label: string;
   name: string;
+  connectionType: string;
+  com: string;
+  ip: string;
+  port: string;
+  apikey: string;
+  mId: string;
+  nmId: string;
+  merchant: string;
+  timeout: number;
   image: string;
-  edc: number;
+  apiUrl: string;
+  apiUrlStatus: string;
   isLock: number;
+  status: number;
 }
 
 export interface PaidEntry {
@@ -69,6 +82,22 @@ export class PaymentComponent implements OnInit {
   selectedTypeLabel = computed(() => {
     const selected = this.paymentTypes().find((type) => type.id === this.selectedTypeId());
     return selected?.label || this.selectedTypeId();
+  });
+  selectedPaymentType = computed(() => {
+    return this.paymentTypes().find((type) => type.id === this.selectedTypeId()) || null;
+  });
+  selectedConnectionType = computed(() => {
+    const selected = this.selectedPaymentType();
+    return String(selected?.connectionType || 'MANUAL').toUpperCase();
+  });
+  selectedPaymentTypeFields = computed(() => {
+    const selected = this.selectedPaymentType();
+    if (!selected) return [] as Array<{ key: string; value: string | number }>;
+
+    const excluded = new Set(['presence', 'inputBy', 'inputDate', 'updateBy', 'updateDate']);
+    return Object.entries(selected)
+      .filter(([key]) => !excluded.has(key))
+      .map(([key, value]) => ({ key, value: typeof value === 'number' ? value : String(value || '-') }));
   });
 
   // Entry amount keypad
@@ -163,9 +192,48 @@ export class PaymentComponent implements OnInit {
       error: () => {
         // Fallback to static list if API fails
         this.paymentTypes.set([
-          { id: 'CASH', label: 'CASH', name: 'Cash', image: '', edc: 0, isLock: 1 },
-          { id: 'DEBITCC', label: 'MANUAL DEBIT CARD', name: 'Debit / Card', image: '', edc: 0, isLock: 1 },
-          { id: 'QRISTELKOM', label: 'QRIS TELKOM', name: 'QRIS', image: '', edc: 0, isLock: 1 },
+          {
+            id: 'CASH',
+            openCashDrawer: 1,
+            edc: 0,
+            label: 'CASH',
+            name: 'Cash',
+            connectionType: 'MANUAL',
+            com: '',
+            ip: '',
+            port: '',
+            apikey: '',
+            mId: '',
+            nmId: '',
+            merchant: '',
+            timeout: 0,
+            image: '',
+            apiUrl: '',
+            apiUrlStatus: '',
+            isLock: 1,
+            status: 1,
+          },
+          {
+            id: 'DEBITCC',
+            openCashDrawer: 0,
+            edc: 0,
+            label: 'MANUAL DEBIT CARD',
+            name: 'Debit / Card',
+            connectionType: 'MANUAL',
+            com: '',
+            ip: '',
+            port: '',
+            apikey: '',
+            mId: '',
+            nmId: '',
+            merchant: '',
+            timeout: 0,
+            image: '',
+            apiUrl: '',
+            apiUrlStatus: '',
+            isLock: 1,
+            status: 1,
+          },
         ]);
       },
     });
@@ -336,13 +404,23 @@ export class PaymentComponent implements OnInit {
   }
 
   addPayment(): void {
+    
+    const activePaymentType = this.paymentTypes().find(
+      (type) => type.id === this.selectedTypeId(),
+    );
+    if (!activePaymentType) {
+      this.errorMessage.set('Tipe pembayaran tidak ditemukan');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
     const paid = parseInt(this.entryAmount(), 10);
     if (!paid || paid < 1) {
       this.errorMessage.set('Jumlah pembayaran tidak valid');
       setTimeout(() => this.errorMessage.set(''), 3000);
       return;
     }
-
+    console.log(activePaymentType);
     const kioskUuid = this.cartService.kioskUuid();
     if (!kioskUuid) return;
 
@@ -375,6 +453,7 @@ export class PaymentComponent implements OnInit {
           setTimeout(() => this.errorMessage.set(''), 3000);
         },
       });
+     
   }
 
   removePayment(entry: PaidEntry): void {
