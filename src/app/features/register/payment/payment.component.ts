@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { SessionService } from '../../../core/services/session.service';
@@ -65,6 +66,19 @@ export interface VoucherSubmitResult {
   totalPaid: number;
 }
 
+interface BcaLanPaymentResp {
+  ApprovalCode?: string;
+  RespCode?: string;
+  response?: string;
+}
+
+interface BcaLanPaymentResult {
+  success: boolean;
+  message: string;
+  responseMessage?: string;
+  resp?: BcaLanPaymentResp;
+}
+
 @Component({
   selector: 'app-payment',
   standalone: true,
@@ -119,6 +133,7 @@ export class PaymentComponent implements OnInit {
   paymentLoading = signal(false);
   addLoading = signal(false);
   completeLoading = signal(false);
+  edcWaiting = signal(false);
   errorMessage = signal('');
 
   userName = '';
@@ -403,8 +418,7 @@ export class PaymentComponent implements OnInit {
       });
   }
 
-  addPayment(): void {
-    
+  async addPayment(): Promise<void> {
     const activePaymentType = this.paymentTypes().find(
       (type) => type.id === this.selectedTypeId(),
     );
@@ -420,40 +434,127 @@ export class PaymentComponent implements OnInit {
       setTimeout(() => this.errorMessage.set(''), 3000);
       return;
     }
-    console.log(activePaymentType);
     const kioskUuid = this.cartService.kioskUuid();
     if (!kioskUuid) return;
 
+    const connectionType = String(activePaymentType.connectionType || 'MANUAL').trim().toUpperCase();
+
+    if (connectionType === 'LAN' || connectionType === 'COM' || connectionType === 'API') {
+      this.errorMessage.set('Gunakan tombol Send to EDC untuk tipe koneksi ini');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    await this.submitPaymentEntry(kioskUuid, paid, '');
+  }
+
+  async sendToEDC(): Promise<void> {
+    const activePaymentType = this.paymentTypes().find(
+      (type) => type.id === this.selectedTypeId(),
+    );
+    if (!activePaymentType) {
+      this.errorMessage.set('Tipe pembayaran tidak ditemukan');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    const paid = parseInt(this.entryAmount(), 10);
+    if (!paid || paid < 1) {
+      this.errorMessage.set('Jumlah pembayaran tidak valid');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
+    const kioskUuid = this.cartService.kioskUuid();
+    if (!kioskUuid) return;
+
+    const connectionType = String(activePaymentType.connectionType || 'MANUAL').trim().toUpperCase();
+
+    if (connectionType === 'COM') {
+      alert('COM on progress');
+      return;
+    }
+
+    if (connectionType === 'API') {
+      alert('API on Progress');
+      return;
+    }
+
+    if (connectionType !== 'LAN') {
+      this.errorMessage.set('Tipe pembayaran ini tidak menggunakan EDC');
+      setTimeout(() => this.errorMessage.set(''), 3000);
+      return;
+    }
+
     this.addLoading.set(true);
-    this.http
-      .post<ApiResponse<{ id: number; payments: PaidEntry[]; totalPaid: number }>>(
+    this.edcWaiting.set(true);
+
+    try {
+      const edcResult = await this.requestEdcLan(activePaymentType, paid);
+      const approvedCode = String(edcResult.resp?.ApprovalCode || '').trim();
+
+      if (!approvedCode) {
+        throw new Error('Transaction failed');
+      }
+
+      await this.submitPaymentEntry(kioskUuid, paid, approvedCode);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Gagal menambah pembayaran';
+      this.errorMessage.set(message);
+      setTimeout(() => this.errorMessage.set(''), 3000);
+    } finally {
+      this.edcWaiting.set(false);
+      this.addLoading.set(false);
+    }
+  }
+
+  private async submitPaymentEntry(kioskUuid: string, paid: number, approvedCode: string): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<ApiResponse<{ id: number; payments: PaidEntry[]; totalPaid: number }>>(
         `${environment.apiUrl}/payment/add`,
         {
           kioskUuid,
           paymentTypeId: this.selectedTypeId(),
           paid,
+          approvedCode,
         },
-      )
-      .subscribe({
-        next: (res) => {
-          this.addLoading.set(false);
-          if (res.success && res.data) {
-            this.paidEntries.set(res.data.payments);
-            this.totalPaid.set(res.data.totalPaid);
-            this.entryAmount.set('0');
-            this.emitDisplayReload();
-          } else {
-            this.errorMessage.set('Gagal menambah pembayaran');
-            setTimeout(() => this.errorMessage.set(''), 3000);
-          }
-        },
-        error: (err) => {
-          this.addLoading.set(false);
-          this.errorMessage.set(err?.error?.message || 'Gagal menambah pembayaran');
-          setTimeout(() => this.errorMessage.set(''), 3000);
-        },
-      });
-     
+      ),
+    );
+
+    if (res.success && res.data) {
+      this.paidEntries.set(res.data.payments);
+      this.totalPaid.set(res.data.totalPaid);
+      this.entryAmount.set('0');
+      this.emitDisplayReload();
+      return;
+    }
+
+    throw new Error(res.message || 'Gagal menambah pembayaran');
+  }
+
+  private async requestEdcLan(paymentType: PaymentType, amount: number): Promise<BcaLanPaymentResult> {
+    const ip = String(paymentType.ip || '').trim();
+    const port = String(paymentType.port || '').trim();
+    const transType = this.getEdcTransType(paymentType.id);
+
+    if (!ip) {
+      throw new Error('IP payment type LAN belum diisi');
+    }
+
+    const res = await firstValueFrom(
+      this.http.post<BcaLanPaymentResult>(`${environment.apiUrl}/payment/bca-lan/payment`, {
+        amount,
+        transType,
+        ip,
+        port,
+      }),
+    );
+
+    if (!res.success) {
+      throw new Error(res.message || 'Gagal menghubungi EDC LAN');
+    }
+
+    return res;
   }
 
   removePayment(entry: PaidEntry): void {
@@ -530,6 +631,20 @@ export class PaymentComponent implements OnInit {
     if (id === 'VOUCHER') return 'redeem';
     if (id.includes('QRIS')) return 'qr_code_2';
     return 'credit_card';
+  }
+
+  private getEdcTransType(paymentTypeId: string): string {
+    const normalizedId = String(paymentTypeId || '').trim().toUpperCase();
+
+    if (normalizedId === 'BCA31') {
+      return '31';
+    }
+
+    if (normalizedId === 'BCA01') {
+      return '01';
+    }
+
+    return '01';
   }
 
   private emitDisplayReload(forceClear = false): void {

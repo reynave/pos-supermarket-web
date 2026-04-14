@@ -139,8 +139,21 @@
         <div class="col-span-3 h-auto">
 
 
-          <!-- Add Payment button -->
-          @if (selectedTypeId() !== 'VOUCHER') {
+          <!-- Payment action button -->
+          @if (selectedTypeId() !== 'VOUCHER' && (selectedConnectionType() === 'LAN' || selectedConnectionType() === 'COM' || selectedConnectionType() === 'API')) {
+          <button
+            class="w-full py-10 bg-primary hover:bg-primary-dark text-white font-bold text-lg rounded-2xl shadow-lg shadow-orange-100 transition-all active:scale-[0.98] disabled:opacity-50 flex flex-col items-center justify-center gap-2"
+            [disabled]="addLoading() || +entryAmount() < 1" (click)="sendToEDC()">
+            @if (addLoading()) {
+            <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            }
+            <span class="material-symbols-outlined">usb</span>
+            <span>Send to EDC</span>
+          </button>
+          } @else if (selectedTypeId() !== 'VOUCHER') {
           <button
             class="w-full py-10 bg-primary hover:bg-primary-dark text-white font-bold text-lg rounded-2xl shadow-lg shadow-orange-100 transition-all active:scale-[0.98] disabled:opacity-50 flex flex-col items-center justify-center gap-2"
             [disabled]="addLoading() || +entryAmount() < 1" (click)="addPayment()">
@@ -261,6 +274,21 @@
     </section>
   </div>
 </main>
+
+@if (edcWaiting()) {
+<div class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/50 p-4">
+  <section class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 text-center">
+    <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-orange-100 text-primary">
+      <svg class="h-8 w-8 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+    <h3 class="text-lg font-black text-slate-900">Waiting Response EDC</h3>
+    <p class="mt-2 text-sm font-medium text-slate-500">Data sedang dikirim ke mesin EDC. Tunggu sampai ada response.</p>
+  </section>
+</div>
+}
 
 @if (isPaymentTypeModalOpen()) {
 <div class="fixed inset-0 z-[70] flex items-end md:items-center justify-center p-4">
