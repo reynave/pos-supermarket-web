@@ -8,7 +8,7 @@ import {
   DailyCloseHistoryResponse,
   DailyCloseService,
 } from '../../../core/services/daily-close.service';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 
 @Component({
   selector: 'app-daily-close-history',
@@ -38,7 +38,7 @@ export class DailyCloseHistoryComponent implements OnInit {
   private loadHistory(): void {
     this.loading.set(true);
     this.dailyCloseService.getHistory().subscribe({
-      next: (res: ApiResponse<DailyCloseHistoryResponse>) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           this.historyItems.set(res.data.items || []);

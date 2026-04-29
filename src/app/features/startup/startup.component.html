@@ -28,18 +28,13 @@
                 <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">Server Connection</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div class="md:col-span-7">
+                    <div class="md:col-span-9">
                         <label class="block text-sm font-semibold mb-1">Host Server / Localhost</label>
                         <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
-                            [ngModel]="config().apiUrl" 
+                            [ngModel]="env.apiUrl" 
                             placeholder="setting in connection.js" readonly />
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold mb-1">Port</label>
-                        <input class="w-full h-12 rounded-xl border-slate-300 focus:border-primary focus:ring-primary"
-                            [ngModel]="config().apiPort" (ngModelChange)="updateField('apiPort', $event)"
-                            placeholder="3000" readonly />
-                    </div>
+                    
                     <div class="md:col-span-3 flex items-end">
                          <button
                         class="px-4 h-11 w-full rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 disabled:opacity-60"

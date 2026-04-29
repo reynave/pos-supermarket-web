@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
 
 interface PaymentTypeRow {
   id: string;
@@ -53,8 +52,8 @@ export class PaymentTypeSettingsComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.get<ApiResponse<PaymentTypeRow[]>>(`${environment.apiUrl}/payment/types/all`).subscribe({
-      next: (res: ApiResponse<PaymentTypeRow[]>) => {
+    this.http.get<any>(`${environment.apiUrl}/payment/types/all`).subscribe({
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && Array.isArray(res.data)) {
           this.paymentTypes.set(res.data);

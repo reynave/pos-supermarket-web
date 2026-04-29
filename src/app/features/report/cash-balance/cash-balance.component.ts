@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
 import { SessionService } from '../../../core/services/session.service';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
@@ -86,15 +85,11 @@ export class CashBalanceComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.get<ApiResponse<CashBalanceHistoryResponse>>(
+    this.http.get<any>(
       `${environment.apiUrl}/manual-cash/history`,
-      {
-        params: {
-          ...(this.selectedResetId() ? { resetId: this.selectedResetId() } : {}),
-        },
-      },
+      { params: { ...(this.selectedResetId() ? { resetId: this.selectedResetId() } : {}) } },
     ).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (!res.success || !res.data) {
           this.cashRows.set([]);

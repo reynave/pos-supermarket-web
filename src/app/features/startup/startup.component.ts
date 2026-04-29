@@ -8,6 +8,7 @@ import {
   StartupConfig,
   StartupConfigService,
 } from '../../core/services/startup-config.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-startup',
@@ -17,6 +18,7 @@ import {
   styleUrl: './startup.component.css',
 })
 export class StartupComponent {
+  env : any = environment;
   config = signal<StartupConfig>(this.startupConfigService.loadConfig());
   testing = signal(false);
   testResult = signal<ConnectionTestResult | null>(null);

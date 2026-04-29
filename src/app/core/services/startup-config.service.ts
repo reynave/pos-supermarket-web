@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, timeout } from 'rxjs/operators';
 import { getRuntimeConnectionConfig } from '../config/runtime-connection';
+import { environment } from '../../../environments/environment';
 
 export type PrinterType = 'LAN' | 'SERIAL' | 'COM';
 
@@ -38,12 +39,23 @@ export class StartupConfigService {
     let hostWithoutPort = runtime.host;
     let apiPort = '';
 
-    try {
-      const url = new URL(runtime.host);
-      hostWithoutPort = `${url.protocol}//${url.hostname}`;
-      apiPort = url.port;
-    } catch {
-      // Keep raw host when URL parsing fails.
+    // Prefer manual values from environment.ts when provided (dev override).
+    if (environment?.apiUrl) {
+      try {
+        const envUrl = new URL(environment.apiUrl);
+        hostWithoutPort = `${envUrl.protocol}//${envUrl.hostname}`;
+        apiPort = envUrl.port;
+      } catch {
+        // ignore and fall back to runtime
+      }
+    } else {
+      try {
+        const url = new URL(runtime.host);
+        hostWithoutPort = `${url.protocol}//${url.hostname}`;
+        apiPort = url.port;
+      } catch {
+        // Keep raw host when URL parsing fails.
+      }
     }
 
     return {
@@ -76,7 +88,7 @@ export class StartupConfigService {
       return of({ ok: false, message: 'API URL wajib diisi', url });
     }
 
-    return this.http.get<{ success?: boolean; message?: string }>(url).pipe(
+    return this.http.get<any>(url).pipe(
       timeout(4000),
       map((res) => {
         if (res?.success === false) {

@@ -6,7 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 import { CartItem } from '../../../core/models/item.model';
 import { Transaction } from '../../../core/models/transaction.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
@@ -62,7 +62,7 @@ export class ReceiptComponent implements OnInit {
 
   private loadReceiptById(id: string): void {
     this.http
-      .get<ApiResponse<{ transaction: Transaction; items: CartItem[]; paymentMethods?: ReceiptPaymentMethod[]; primaryPaymentTypeId: string; receiptHtml?: string }>>(
+      .get<any>(
         `${environment.apiUrl}/transactions/${id}?renderReceiptHtml=true&template=bill.hbs`,
       )
       .subscribe({
@@ -98,10 +98,7 @@ export class ReceiptComponent implements OnInit {
    
    
     this.http
-      .post<ApiResponse<{ id: number; transactionId: string; inputDate: string; inputBy: string | null }>>(
-        `${environment.apiUrl}/print/transaction/${encodeURIComponent(transactionId)}/log`,
-        {},
-      )
+      .post<any>(`${environment.apiUrl}/print/transaction/${encodeURIComponent(transactionId)}/log`, {})
       .subscribe({
         next: () => {
            this.browserPrint();

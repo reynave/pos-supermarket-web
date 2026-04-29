@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/api-response.model';
 import { Item } from '../models/item.model';
 
 /** Raw shape returned by backend item endpoints */
@@ -50,8 +49,8 @@ export class ItemService {
   /** Search items by description keyword (GET) */
   searchItems(q: string): Observable<Item[]> {
     return this.http
-      .get<ApiResponse<BackendSearchResult>>(`${this.API}/item/search`, { params: { q } })
-      .pipe(map((res) => (res.success && res.data?.items ? res.data.items.map((i) => this.mapToItem(i)) : [])));
+      .get<any>(`${this.API}/item/search`, { params: { q } })
+      .pipe(map((res) => (res.success && res.data?.items ? res.data.items.map((i: any) => this.mapToItem(i)) : [])));
   }
 
   /**
@@ -60,7 +59,7 @@ export class ItemService {
    */
   addByBarcode(kioskUuid: string, barcode: string): Observable<Item | null> {
     return this.http
-      .post<ApiResponse<BackendCartInsertResult>>(`${this.API}/item/barcode`, { kioskUuid, barcode })
+      .post<any>(`${this.API}/item/barcode`, { kioskUuid, barcode })
       .pipe(
         map((res) => (res.success && res.data ? this.mapToItem(res.data) : null)),
         catchError(() => of(null)),
@@ -73,7 +72,7 @@ export class ItemService {
    */
   addByItemId(kioskUuid: string, itemId: string): Observable<Item | null> {
     return this.http
-      .post<ApiResponse<BackendCartInsertResult>>(`${this.API}/item/add`, { kioskUuid, itemId })
+      .post<any>(`${this.API}/item/add`, { kioskUuid, itemId })
       .pipe(
         map((res) => (res.success && res.data ? this.mapToItem(res.data) : null)),
         catchError(() => of(null)),
@@ -85,7 +84,7 @@ export class ItemService {
    */
   addQtyBySelected(kioskUuid: string, itemId: string, qty: number, barcode?: string): Observable<AddQtyResult | null> {
     return this.http
-      .post<ApiResponse<AddQtyResult>>(`${this.API}/item/add-qty`, { kioskUuid, itemId, qty, barcode })
+      .post<any>(`${this.API}/item/add-qty`, { kioskUuid, itemId, qty, barcode })
       .pipe(
         map((res) => (res.success && res.data ? res.data : null)),
         catchError(() => of(null)),

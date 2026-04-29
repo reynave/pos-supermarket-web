@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/api-response.model';
 import { User, LoginRequest, LoginResponse } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
@@ -20,12 +19,12 @@ export class AuthService {
     private router: Router,
   ) {}
 
-  login(data: LoginRequest): Observable<ApiResponse<LoginResponse>> {
+  login(data: LoginRequest): Observable<any> {
     const body = {
       ...data,
       terminalId: data.terminalId || environment.terminalId,
     };
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.API}/auth/login`, body).pipe(
+    return this.http.post<any>(`${this.API}/auth/login`, body).pipe(
       tap((res) => {
         if (res.success && res.data) {
           localStorage.setItem(this.TOKEN_KEY, res.data.token);
@@ -36,14 +35,14 @@ export class AuthService {
     );
   }
 
-  logout(): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.API}/auth/logout`, {}).pipe(
+  logout(): Observable<any> {
+    return this.http.post<any>(`${this.API}/auth/logout`, {}).pipe(
       tap(() => this.clearSession()),
     );
   }
 
-  getProfile(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.API}/auth/me`);
+  getProfile(): Observable<any> {
+    return this.http.get<any>(`${this.API}/auth/me`);
   }
 
   getToken(): string | null {

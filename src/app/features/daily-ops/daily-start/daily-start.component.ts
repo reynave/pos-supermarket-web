@@ -5,7 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SessionService } from '../../../core/services/session.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 
 @Component({
   selector: 'app-daily-start',
@@ -67,11 +67,8 @@ export class DailyStartComponent {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.post<ApiResponse<{ resetId?: string; settlementId?: string; cashierId: string; openingBalance: number; terminalId: string; alreadyOpen: boolean }>>(
-      `${environment.apiUrl}/shift/open`,
-      { openingBalance, terminalId: environment.terminalId },
-    ).subscribe({
-      next: (res) => {
+    this.http.post<any>(`${environment.apiUrl}/shift/open`, { openingBalance, terminalId: environment.terminalId }).subscribe({
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           const sessionId = res.data.resetId || res.data.settlementId || '';

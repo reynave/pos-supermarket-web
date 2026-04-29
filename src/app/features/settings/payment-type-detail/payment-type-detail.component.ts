@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 
 interface PaymentTypeDetail {
   id: string;
@@ -95,8 +95,8 @@ export class PaymentTypeDetailComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.http.get<ApiResponse<PaymentTypeDetail>>(`${environment.apiUrl}/payment/types/${encodeURIComponent(id)}`).subscribe({
-      next: (res: ApiResponse<PaymentTypeDetail>) => {
+    this.http.get<any>(`${environment.apiUrl}/payment/types/${encodeURIComponent(id)}`).subscribe({
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           this.form.set({
@@ -155,8 +155,8 @@ export class PaymentTypeDetailComponent implements OnInit {
     };
 
     this.saving.set(true);
-    this.http.put<ApiResponse<PaymentTypeDetail>>(`${environment.apiUrl}/payment/types/${encodeURIComponent(this.id())}`, payload).subscribe({
-      next: (res: ApiResponse<PaymentTypeDetail>) => {
+    this.http.put<any>(`${environment.apiUrl}/payment/types/${encodeURIComponent(this.id())}`, payload).subscribe({
+      next: (res: any) => {
         this.saving.set(false);
         if (res.success && res.data) {
           this.form.set({

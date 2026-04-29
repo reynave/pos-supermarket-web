@@ -2,7 +2,6 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/api-response.model';
 import { Item, CartItem } from '../models/item.model';
 import { Transaction } from '../models/transaction.model';
 
@@ -76,11 +75,11 @@ export class CartService {
   constructor(private http: HttpClient) {}
 
   /** POST /api/cart/new — create new cart session on backend, save kioskUuid to localStorage */
-  createNewCart(cashierId: string, terminalId: string, storeOutletId?: string): Observable<ApiResponse<KioskUuidRecord>> {
+  createNewCart(cashierId: string, terminalId: string, storeOutletId?: string): Observable<any> {
     const body: Record<string, string> = { cashierId, terminalId };
     if (storeOutletId) body['storeOutletId'] = storeOutletId;
 
-    return this.http.post<ApiResponse<KioskUuidRecord>>(`${environment.apiUrl}/cart/new`, body).pipe(
+    return this.http.post<any>(`${environment.apiUrl}/cart/new`, body).pipe(
       tap((res) => {
         if (res.success && res.data) {
           this.setKioskUuid(res.data.kioskUuid);
@@ -107,9 +106,9 @@ export class CartService {
    * POST /api/cart/void/:kioskUuid — verify PIN + hard delete all cart data on backend,
    * then clear local cart state + kioskUuid from localStorage.
    */
-  voidCartSession(kioskUuid: string, pin: string): Observable<ApiResponse<{ kioskUuid: string; authorizedBy: string }>> {
+  voidCartSession(kioskUuid: string, pin: string): Observable<any> {
     return this.http
-      .post<ApiResponse<{ kioskUuid: string; authorizedBy: string }>>(`${environment.apiUrl}/cart/void/${kioskUuid}`, { pin })
+      .post<any>(`${environment.apiUrl}/cart/void/${kioskUuid}`, { pin })
       .pipe(
         tap((res) => {
           if (res.success) {
@@ -121,11 +120,8 @@ export class CartService {
   }
 
   /** POST /api/cart/voidItem/:kioskUuid — void selected qty for one item in cart session */
-  voidItemSession(kioskUuid: string, payload: VoidItemPayload): Observable<ApiResponse<{ kioskUuid: string; qty: number }>> {
-    return this.http.post<ApiResponse<{ kioskUuid: string; qty: number }>>(
-      `${environment.apiUrl}/cart/voidItem/${kioskUuid}`,
-      payload,
-    );
+  voidItemSession(kioskUuid: string, payload: VoidItemPayload): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/cart/voidItem/${kioskUuid}`, payload);
   }
 
   /** Load kioskUuid from localStorage on service init */
@@ -139,12 +135,12 @@ export class CartService {
    */
   loadCart(kioskUuid: string): Observable<CartListResponse | null> {
     return this.http
-      .get<ApiResponse<CartListResponse>>(`${environment.apiUrl}/cart/list/${kioskUuid}`)
+      .get<any>(`${environment.apiUrl}/cart/list/${kioskUuid}`)
       .pipe(
         map((res) => {
           if (res.success && res.data) {
             // Restore cart items into signal
-            const cartItems: CartItem[] = res.data.items.map((i) => ({
+            const cartItems: CartItem[] = res.data.items.map((i: any) => ({
               id: crypto.randomUUID(),
               itemId: i.itemId,
               name: i.name,

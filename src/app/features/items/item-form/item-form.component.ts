@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 import { ItemsAdminService } from '../../../core/services/items-admin.service';
 import { ToastService } from '../../../core/services/toast.service';
 import {
@@ -82,8 +82,8 @@ export class ItemFormComponent implements OnInit {
       this.saveLoading.set(true);
 
       if (this.mode() === 'create') {
-        this.itemsAdminService.create(this.form()).subscribe({
-          next: (res: ApiResponse<ItemAdminDetail>) => {
+            this.itemsAdminService.create(this.form()).subscribe({
+              next: (res: any) => {
             this.saveLoading.set(false);
             if (res.success && res.data) {
               this.toastService.success(`Item "${res.data.description}" created successfully`);
@@ -105,7 +105,7 @@ export class ItemFormComponent implements OnInit {
       }
 
       this.itemsAdminService.update(this.editingId, this.form()).subscribe({
-        next: (res: ApiResponse<ItemAdminDetail>) => {
+        next: (res: any) => {
           this.saveLoading.set(false);
           if (res.success && res.data) {
             this.toastService.success(`Item "${res.data.description}" updated successfully`);
@@ -177,7 +177,7 @@ export class ItemFormComponent implements OnInit {
   private loadMeta(): void {
     this.metaLoading.set(true);
     this.itemsAdminService.getMeta().subscribe({
-      next: (res: ApiResponse<ItemsAdminMeta>) => {
+      next: (res: any) => {
         this.metaLoading.set(false);
         if (res.success && res.data) {
           this.categories.set(res.data.categories ?? []);
@@ -209,7 +209,7 @@ export class ItemFormComponent implements OnInit {
   private loadDetail(id: string): void {
     this.loading.set(true);
     this.itemsAdminService.getById(id).subscribe({
-      next: (res: ApiResponse<ItemAdminDetail>) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           this.form.set(this.toFormValue(res.data));

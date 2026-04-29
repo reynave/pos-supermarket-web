@@ -9,7 +9,6 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { environment } from '../../../../environments/environment';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 import { CashDeclarationPayload, DailyCloseService, DailyCloseSummaryResponse } from '../../../core/services/daily-close.service';
-import { ApiResponse } from '../../../core/models/api-response.model';
 
 interface ShiftSummary {
   grossSales: number;
@@ -99,15 +98,15 @@ export class DailyCloseComponent {
 
     this.loading.set(true);
     this.dailyCloseService.getSummary(sessionId).subscribe({
-      next: (res: ApiResponse<DailyCloseSummaryResponse>) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           const d = res.data;
           const totalCashIn = Number(d.balanceSummary?.totalCashIn || 0);
           const totalCashOut = Number(d.balanceSummary?.totalCashOut || 0);
           const digitalPayments = (d.payments || [])
-            .filter((p) => p.paymentTypeId !== 'CASH' && p.paymentTypeId !== 'DISC.BILL')
-            .reduce((sum, p) => sum + Number(p.paidAmount || 0), 0);
+            .filter((p: any) => p.paymentTypeId !== 'CASH' && p.paymentTypeId !== 'DISC.BILL')
+            .reduce((sum: number, p: any) => sum + Number(p.paidAmount || 0), 0);
 
           this.summary.set({
             grossSales: Number(d.reset?.overalFinalPrice || 0),
@@ -148,7 +147,7 @@ export class DailyCloseComponent {
       notes: this.shiftNotes,
       cashDeclaration,
     }).subscribe({
-      next: (res: ApiResponse<any>) => {
+      next: (res: any) => {
         this.closing.set(false);
         if (res.success) {
           this.sessionService.endShift();

@@ -4,7 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 import { ItemsAdminService } from '../../../core/services/items-admin.service';
 import { ItemAdminListItem, ItemAdminListResponse } from '../data/item-admin.model';
 import { ToastService } from '../../../core/services/toast.service';
@@ -198,7 +198,7 @@ export class ItemsListComponent implements OnInit {
 
     this.loading.set(true);
     this.itemsAdminService.list(query, page, this.pageSize()).subscribe({
-      next: (res: ApiResponse<ItemAdminListResponse>) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           this.filteredItems.set(res.data.items ?? []);

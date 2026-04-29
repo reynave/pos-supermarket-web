@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { SocketService } from '../../../core/services/socket.service';
 import { CartItem } from '../../../core/models/item.model';
-import { ApiResponse } from '../../../core/models/api-response.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 import { environment } from '../../../../environments/environment';
 
@@ -111,11 +110,11 @@ export class CustomerDisplayComponent implements OnInit, OnDestroy {
 
     localStorage.setItem(this.KIOSK_KEY, kioskUuid);
 
-    this.http.get<ApiResponse<CartSnapshotResponse>>(`${environment.apiUrl}/cart/list/${kioskUuid}`).subscribe({
-      next: (res) => {
+    this.http.get<any>(`${environment.apiUrl}/cart/list/${kioskUuid}`).subscribe({
+      next: (res: any) => {
         if (res.success && res.data) {
           this.items.set(
-            (res.data.items ?? []).map((item, index) => ({
+            (res.data.items ?? []).map((item: any, index: number) => ({
               id: `${item.itemId}-${index}`,
               itemId: item.itemId,
               name: item.name,
@@ -143,11 +142,11 @@ export class CustomerDisplayComponent implements OnInit, OnDestroy {
     });
 
     this.http
-      .get<ApiResponse<{ payments: DisplayPayment[]; totalPaid: number }>>(`${environment.apiUrl}/payment/pending/${kioskUuid}`)
+      .get<any>(`${environment.apiUrl}/payment/pending/${kioskUuid}`)
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           if (res.success && res.data) {
-            this.payments.set((res.data.payments ?? []).map((payment) => this.normalizePayment(payment)));
+            this.payments.set((res.data.payments ?? []).map((payment: any) => this.normalizePayment(payment)));
           } else {
             this.payments.set([]);
           }

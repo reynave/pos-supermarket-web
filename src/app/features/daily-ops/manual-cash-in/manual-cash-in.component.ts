@@ -6,7 +6,6 @@ import { ManualCashService, ManualCashSummaryResponse } from '../../../core/serv
 import { SessionService } from '../../../core/services/session.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
 
 @Component({
   selector: 'app-manual-cash-in',
@@ -65,7 +64,7 @@ export class ManualCashInComponent {
     this.errorMessage.set('');
 
     this.manualCashService.openDrawer({ terminalId: environment.terminalId }).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.drawerLoading.set(false);
         if (res.success) {
           this.infoMessage.set(res.message || 'Cash drawer opened');
@@ -97,7 +96,7 @@ export class ManualCashInComponent {
       terminalId: environment.terminalId,
       amount,
     }).subscribe({
-      next: (res: ApiResponse<{ resetId: string; addedAmount: number; currentCashBalance: number }>) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success) {
           this.infoMessage.set(`Manual cash in added: Rp ${this.formattedAmount}`);
@@ -116,7 +115,7 @@ export class ManualCashInComponent {
 
   private loadSummary(): void {
     this.manualCashService.getSummary(environment.terminalId).subscribe({
-      next: (res: ApiResponse<ManualCashSummaryResponse>) => {
+      next: (res: any) => {
         if (res.success && res.data) {
           this.summary.set(res.data);
         }

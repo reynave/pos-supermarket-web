@@ -10,7 +10,7 @@ import { SessionService } from '../../../core/services/session.service';
 import { SocketService } from '../../../core/services/socket.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 import { Transaction } from '../../../core/models/transaction.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
@@ -193,18 +193,18 @@ export class PaymentComponent implements OnInit {
   // ─── Payment Types ────────────────────────────────────────────────────────
 
   private loadPaymentTypes(): void {
-    this.http.get<ApiResponse<PaymentType[]>>(`${environment.apiUrl}/payment/types`).subscribe({
-      next: (res) => {
+    this.http.get<any>(`${environment.apiUrl}/payment/types`).subscribe({
+        next: (res: any) => {
         if (res.success && res.data) {
           // Filter out EDC/internal types for simple UI; keep CASH, DEBITCC, QRIS etc.
-          const visible = res.data.filter((t) => t.isLock === 1);
+          const visible = res.data.filter((t: any) => t.isLock === 1);
           this.paymentTypes.set(visible);
-          if (visible.length && !visible.find((t) => t.id === this.selectedTypeId())) {
+          if (visible.length && !visible.find((t: any) => t.id === this.selectedTypeId())) {
             this.selectedTypeId.set(visible[0].id);
           }
         }
       },
-      error: () => {
+        error: (_err: any) => {
         // Fallback to static list if API fails
         this.paymentTypes.set([
           {
@@ -284,12 +284,8 @@ export class PaymentComponent implements OnInit {
     }
 
     this.voucherValidationLoading.set(true);
-    this.http
-      .get<ApiResponse<VoucherValidationResult>>(
-        `${environment.apiUrl}/voucher/${encodeURIComponent(rawCode)}`,
-      )
-      .subscribe({
-        next: (res) => {
+    this.http.get<any>(`${environment.apiUrl}/voucher/${encodeURIComponent(rawCode)}`).subscribe({
+        next: (res: any) => {
           this.voucherValidationLoading.set(false);
 
           if (!res.success || !res.data) {
@@ -308,13 +304,13 @@ export class PaymentComponent implements OnInit {
               : (res.data.reason || 'Voucher tidak valid'),
           );
         },
-        error: (err) => {
+        error: (err: any) => {
           this.voucherValidationLoading.set(false);
           this.voucherValid.set(false);
           this.voucherAmount.set(0);
           this.voucherValidationMessage.set(err?.error?.message || 'Gagal validasi voucher');
         },
-      });
+        });
   }
 
   submitVoucher(): void {
@@ -332,13 +328,8 @@ export class PaymentComponent implements OnInit {
     }
 
     this.voucherSubmitLoading.set(true);
-    this.http
-      .post<ApiResponse<VoucherSubmitResult>>(`${environment.apiUrl}/voucher/use`, {
-        kioskUuid,
-        voucherCode,
-      })
-      .subscribe({
-        next: (res) => {
+    this.http.post<any>(`${environment.apiUrl}/voucher/use`, { kioskUuid, voucherCode }).subscribe({
+        next: (res: any) => {
           this.voucherSubmitLoading.set(false);
 
           if (!res.success || !res.data) {
@@ -355,7 +346,7 @@ export class PaymentComponent implements OnInit {
           this.voucherValidationMessage.set(`Voucher ${voucherCode} berhasil dipakai`);
           this.emitDisplayReload();
         },
-        error: (err) => {
+        error: (err: any) => {
           this.voucherSubmitLoading.set(false);
           this.voucherValidationMessage.set(err?.error?.message || 'Submit voucher gagal');
         },
@@ -402,19 +393,15 @@ export class PaymentComponent implements OnInit {
   private loadPendingPayments(): void {
     const kioskUuid = this.cartService.kioskUuid();
     if (!kioskUuid) return;
-    this.http
-      .get<ApiResponse<{ payments: PaidEntry[]; totalPaid: number }>>(
-        `${environment.apiUrl}/payment/pending/${kioskUuid}`,
-      )
-      .subscribe({
-        next: (res) => {
+    this.http.get<any>(`${environment.apiUrl}/payment/pending/${kioskUuid}`).subscribe({
+        next: (res: any) => {
           if (res.success && res.data) {
             this.paidEntries.set(res.data.payments);
             this.totalPaid.set(res.data.totalPaid);
             this.emitDisplayReload();
           }
         },
-        error: () => {},
+        error: (_err: any) => {},
       });
   }
 
@@ -510,15 +497,12 @@ export class PaymentComponent implements OnInit {
 
   private async submitPaymentEntry(kioskUuid: string, paid: number, approvedCode: string): Promise<void> {
     const res = await firstValueFrom(
-      this.http.post<ApiResponse<{ id: number; payments: PaidEntry[]; totalPaid: number }>>(
-        `${environment.apiUrl}/payment/add`,
-        {
-          kioskUuid,
-          paymentTypeId: this.selectedTypeId(),
-          paid,
-          approvedCode,
-        },
-      ),
+      this.http.post<any>(`${environment.apiUrl}/payment/add`, {
+        kioskUuid,
+        paymentTypeId: this.selectedTypeId(),
+        paid,
+        approvedCode,
+      }),
     );
 
     if (res.success && res.data) {
@@ -542,7 +526,7 @@ export class PaymentComponent implements OnInit {
     }
 
     const res = await firstValueFrom(
-      this.http.post<BcaLanPaymentResult>(`${environment.apiUrl}/payment/bca-lan/payment`, {
+      this.http.post<any>(`${environment.apiUrl}/payment/bca-lan/payment`, {
         amount,
         transType,
         ip,
@@ -562,20 +546,17 @@ export class PaymentComponent implements OnInit {
     if (!kioskUuid) return;
 
     this.http
-      .delete<ApiResponse<{ payments: PaidEntry[]; totalPaid: number }>>(
-        `${environment.apiUrl}/payment/${entry.id}`,
-        { body: { kioskUuid } },
-      )
+      .delete<any>(`${environment.apiUrl}/payment/${entry.id}`, { body: { kioskUuid } })
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           if (res.success && res.data) {
             this.paidEntries.set(res.data.payments);
             this.totalPaid.set(res.data.totalPaid);
             this.emitDisplayReload();
           }
         },
-        error: (err) => {
-          this.errorMessage.set(err?.error?.message || 'Gagal menghapus pembayaran');
+          error: (err: any) => {
+            this.errorMessage.set(err?.error?.message || 'Gagal menghapus pembayaran');
           setTimeout(() => this.errorMessage.set(''), 3000);
         },
       });
@@ -602,8 +583,8 @@ export class PaymentComponent implements OnInit {
 
     this.completeLoading.set(true);
 
-    this.http.post<ApiResponse<Transaction>>(`${environment.apiUrl}/payment/complete`, body).subscribe({
-      next: (res) => {
+    this.http.post<any>(`${environment.apiUrl}/payment/complete`, body).subscribe({
+      next: (res: any) => {
         this.completeLoading.set(false);
         if (res.success && res.data) {
           const primaryMethod = this.paidEntries()[0]?.paymentTypeId?.toLowerCase() ?? 'cash';
@@ -616,7 +597,7 @@ export class PaymentComponent implements OnInit {
           setTimeout(() => this.errorMessage.set(''), 4000);
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         this.completeLoading.set(false);
         this.errorMessage.set(err?.error?.message || 'Pembayaran gagal diselesaikan');
         setTimeout(() => this.errorMessage.set(''), 4000);

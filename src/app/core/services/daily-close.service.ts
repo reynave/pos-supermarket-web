@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/api-response.model';
+ 
 
 export interface DailyCloseSummaryResponse {
   reset: {
@@ -59,10 +59,8 @@ export interface CashDeclarationPayload {
 export class DailyCloseService {
   constructor(private http: HttpClient) {}
 
-  getSummary(resetId: string): Observable<ApiResponse<DailyCloseSummaryResponse>> {
-    return this.http.get<ApiResponse<DailyCloseSummaryResponse>>(
-      `${environment.apiUrl}/daily-close/${resetId}`,
-    );
+  getSummary(resetId: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/daily-close/${resetId}`);
   }
 
   submit(
@@ -73,22 +71,15 @@ export class DailyCloseService {
       notes?: string;
       cashDeclaration: CashDeclarationPayload;
     },
-  ): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(
-      `${environment.apiUrl}/daily-close/${resetId}`,
-      payload,
-    );
+  ): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/daily-close/${resetId}`, payload);
   }
 
-  getReport(resetId: string): Observable<ApiResponse<DailyCloseSummaryResponse>> {
-    return this.http.get<ApiResponse<DailyCloseSummaryResponse>>(
-      `${environment.apiUrl}/daily-close/report/${resetId}`,
-    );
+  getReport(resetId: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/daily-close/report/${resetId}`);
   }
 
-  getHistory(): Observable<ApiResponse<DailyCloseHistoryResponse>> {
-    return this.http.get<ApiResponse<DailyCloseHistoryResponse>>(
-      `${environment.apiUrl}/daily-close/history`,
-    );
+  getHistory(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/daily-close/history`);
   }
 }

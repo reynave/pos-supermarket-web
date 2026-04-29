@@ -4,8 +4,8 @@ const runtime = getRuntimeConnectionConfig();
 
 export const environment = {
   production: false,
-  apiUrl: runtime.apiUrl,
-  socketUrl: runtime.socketUrl,
+  apiUrl: 'http://localhost:3000/api', 
+  socketUrl: 'http://localhost:3000',
   terminalId: runtime.terminalId,
   storeOutletId: runtime.storeOutletId,
 };

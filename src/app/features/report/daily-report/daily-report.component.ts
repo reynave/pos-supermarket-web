@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { environment } from '../../../../environments/environment';
-import { ApiResponse } from '../../../core/models/api-response.model';
+
 import { Transaction } from '../../../core/models/transaction.model';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
@@ -99,11 +99,11 @@ export class DailyReportComponent implements OnInit {
   private loadTransactions(): void {
     this.loading.set(true);
     const dateStr = this.selectedDate().toISOString().split('T')[0];
-    this.http.get<ApiResponse<{ items: Transaction[]; total: number }>>(
+    this.http.get<any>(
       `${environment.apiUrl}/transactions`,
       { params: { date: dateStr, page: this.currentPage(), limit: this.pageSize } },
     ).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.loading.set(false);
         if (res.success && res.data) {
           this.transactions.set(res.data.items ?? []);
