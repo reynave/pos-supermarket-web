@@ -1,0 +1,1 @@
+import{ca as e}from"./chunk-6ATFA2WD.js";var o=(()=>{class r{transform(t){return t==null?"0":""+Math.round(t).toLocaleString("id-ID")}static{this.\u0275fac=function(i){return new(i||r)}}static{this.\u0275pipe=e({name:"currencyIdr",type:r,pure:!0,standalone:!0})}}return r})();export{o as a};
