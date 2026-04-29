@@ -3,7 +3,7 @@ import { getRuntimeConnectionConfig } from '../app/core/config/runtime-connectio
 const runtime = getRuntimeConnectionConfig();
 
 export const environment = {
-  production: true,
+  production: false,
   apiUrl: 'http://localhost:3000/api', 
   socketUrl: 'http://localhost:3000',
   terminalId: runtime.terminalId, 

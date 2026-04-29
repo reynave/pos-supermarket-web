@@ -3,9 +3,8 @@ import { getRuntimeConnectionConfig } from '../app/core/config/runtime-connectio
 const runtime = getRuntimeConnectionConfig();
 
 export const environment = {
-  production: false,
-
-    apiUrl : "https://supermarket.mitralinksolusi.com/api",
+  production: true,
+  apiUrl : "https://supermarket.mitralinksolusi.com/api",
   socketUrl: "https://supermarket.mitralinksolusi.com",
   terminalId: runtime.terminalId,
   storeOutletId: runtime.storeOutletId,
