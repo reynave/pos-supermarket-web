@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PromotionItem } from '../../features/promotion/data/promotion.model';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class PromotionItemService {
-  private readonly apiUrl = '/api/promotion';
+  private readonly apiUrl = `${environment.apiUrl}/promotion`;
 
   constructor(private readonly http: HttpClient) {}
 
