@@ -4,8 +4,9 @@ const runtime = getRuntimeConnectionConfig();
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api', 
-  socketUrl: 'http://localhost:3000',
+
+    apiUrl : "https://supermarket.mitralinksolusi.com/api",
+  socketUrl: "https://supermarket.mitralinksolusi.com",
   terminalId: runtime.terminalId,
   storeOutletId: runtime.storeOutletId,
 };
