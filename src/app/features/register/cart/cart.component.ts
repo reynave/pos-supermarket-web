@@ -61,9 +61,12 @@ export class CartComponent implements OnInit, OnDestroy {
 
     // Auto-create kioskUuid (cart session) if none exists
     if (!this.cartService.kioskUuid()) {
+         console.log('*** No active session (kioskUuid). Creating new cart session...');
       this.initCartSession();
+   
     } else {
       // Session exists → load cart items from backend
+      console.log('*** Existing session found (kioskUuid: ' + this.cartService.kioskUuid() + '). Loading cart items...');
       this.httpGetItem();
     }
   }
