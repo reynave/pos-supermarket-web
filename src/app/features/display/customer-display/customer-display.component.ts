@@ -24,27 +24,6 @@ interface DisplayData {
   forceClear?: boolean;
 }
 
-interface CartSnapshotItem {
-  itemId: string;
-  name: string;
-  barcode: string;
-  qty: number;
-  price: number;
-  discount: number;
-  tax: number;
-  total: number;
-  uom: string;
-  promotionName?: string | null;
-  isFreeItem?: boolean;
-}
-
-interface CartSnapshotResponse {
-  items: CartSnapshotItem[];
-  subtotal: number;
-  tax: number;
-  grandTotal: number;
-}
-
 @Component({
   selector: 'app-customer-display',
   standalone: true,

@@ -60,12 +60,6 @@ export interface VoucherValidationResult {
   inputBy: string | null;
 }
 
-export interface VoucherSubmitResult {
-  voucher: VoucherValidationResult;
-  payments: PaidEntry[];
-  totalPaid: number;
-}
-
 interface BcaLanPaymentResp {
   ApprovalCode?: string;
   RespCode?: string;

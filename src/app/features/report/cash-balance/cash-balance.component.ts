@@ -8,13 +8,6 @@ import { environment } from '../../../../environments/environment';
 import { SessionService } from '../../../core/services/session.service';
 import { CurrencyIdrPipe } from '../../../shared/pipes/currency-idr.pipe';
 
-interface CashBalanceHistoryResponse {
-  openingBalance: number;
-  items: CashBalanceRow[];
-  total: number;
-  resetOptions: string[];
-}
-
 interface CashBalanceRow {
   resetId: string;
   dateTime: string;

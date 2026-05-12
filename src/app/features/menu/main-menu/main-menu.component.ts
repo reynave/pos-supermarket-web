@@ -74,8 +74,8 @@ export class MainMenuComponent implements OnInit, OnDestroy {
     }
 
     if (mod.openInNewTab) {
-      const url = this.router.serializeUrl(this.router.createUrlTree([mod.route]));
-      window.open(url, '_blank', 'noopener,noreferrer');
+      const hashUrl = `${window.location.origin}${window.location.pathname}#${mod.route}`;
+      window.open(hashUrl, '_blank', 'noopener,noreferrer');
       return;
     }
 

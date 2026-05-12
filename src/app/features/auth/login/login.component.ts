@@ -128,8 +128,7 @@ export class LoginComponent implements AfterViewInit {
     this.passwordInput?.nativeElement.focus();
   }
 
-  goToSetup(){
-  this.router.navigate(['/startup']);
-   // history.back(); // Kembali ke halaman sebelumnya (setup) jika pengguna ingin mengubah konfigurasi koneksi
+  goToSetup(): void {
+    history.back();
   }
 }
